@@ -1,0 +1,19 @@
+{
+  "tailwindCSS.experimental.classRegex": [
+    [
+      "([\"'`][^\"'`]*.*?[\"'`])",
+      "[\"'`]([^\"'`]*).*?[\"'`]"
+    ]
+  ],
+
+  "autoBarrel.enabled": true,
+  "autoBarrel.watch": true,
+  "autoBarrel.exclude": [
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/*.stories.tsx"
+  ],
+  "autoBarrel.depth": 3,
+  "autoBarrel.indexName": "index.ts"
+}
+
