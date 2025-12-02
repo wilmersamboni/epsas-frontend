@@ -1,28 +1,62 @@
-import React from 'react';
-import type { CardsInfo } from '../types/Cards';
+import { Card, CardHeader, CardBody } from "@heroui/card";
 
+export function DashboardCards() {
+  const cards = [
+    {
+      title: "Seguimiento",
+      img: "/img/biotic.jpg",
+    },
+    {
+      title: "Historial",
+      img: "/img/biotic.jpg",
+    },
+    {
+      title: "Formatos",
+      img: "/img/biotic.jpg",
+    },
+    {
+      title: "MiChat",
+      img: "/img/biotic.jpg",
+    }
+  ];
 
-const Card = ({title, foto, url}: CardsInfo) => {
   return (
-    <div className="relative flex w-80 flex-col rounded-xl  bg-clip-border  shadow-xl/20 bg-gray-200">
-      <div className="relative mx-4 -mt-6 h-40 overflow-hidden rounded-xl  bg-clip-border    inset-shadow-sm">
-      <img src={foto} alt="" />
-      </div>
-      <div className="p-6">
-        <h5 className="mb-2 block font-sans text-xl font-semibold leading-snug tracking-normal text-blue-gray-900 antialiased">
-          
-        </h5>
-        <p className="block font-sans text-base font-light leading-relaxed text-inherit antialiased">
-          
-        </p>
-      </div>
-      <div className="p-6 pt-0 text-xl font-bold ">
-        <h1>{title}</h1>
-      </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12 w-full px-6">
+      {cards.map((card, index) => (
+        <Card
+          key={index}
+          isPressable
+          className="
+            transition-all duration-300 
+            hover:shadow-2xl 
+            hover:scale-[1.03] 
+            cursor-pointer
+            overflow-hidden
+            rounded-2xl
+          "
+        >
 
-      
+          {/* Imagen como fondo */}
+          <CardBody
+            className="
+              h-40 
+              bg-cover 
+              bg-center 
+              rounded-xl
+            "
+            style={{
+              backgroundImage: `url(${card.img})`,
+            }}
+          />
+
+          {/* Texto */}
+          <CardHeader className="flex flex-col items-start p-4">
+            <h3 className="text-lg font-semibold">{card.title}</h3>
+            <p className="text-3xl font-bold">{card.value}</p>
+          </CardHeader>
+
+        </Card>
+      ))}
     </div>
   );
 }
-
-export default Card;
