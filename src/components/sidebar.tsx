@@ -12,9 +12,9 @@ export default function Sidebar({ open }: { open: boolean }) {
   const links: LinkItem[] = [
     { label: "Inicio", icon: <Home />, href: "/" },
     { label: "Seguimiento", icon: <Users />, href: "/AboutPage" },
-    { label: "Historial", icon: <FolderClock />, href: "/DocsPage" },
-    { label: "Formatos", icon: <Library />, href: "/DocsPage" },
-    { label: "MiChat", icon: <MessageCircle />, href: "/DocsPage" },
+    { label: "Historial", icon: <FolderClock />, href: "/docs" },
+    { label: "Formatos", icon: <Library />, href: "/format" },
+    { label: "MiChat", icon: <MessageCircle />, href: "/blog" },
     { label: "Cerrar Sesion", icon: <DoorOpen />, href: "/DocsPage" },
   ];
 
