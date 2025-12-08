@@ -50,7 +50,7 @@ export const Navbar = () => {
             color="foreground"
             href="/"
           >
-            <Logo />
+            {/* <Logo /> */}
             <p className="font-bold text-inherit">EPSAS</p>
           </Link>
         </NavbarBrand>

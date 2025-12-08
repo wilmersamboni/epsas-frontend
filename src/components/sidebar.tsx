@@ -1,5 +1,5 @@
 import { Card } from "@heroui/react";
-import { Home, Users, Settings, Menu } from "lucide-react";
+import { Home, Users, Settings, Menu, DoorOpen,MessageCircle,Library,FolderClock } from "lucide-react";
 import { useState, ReactNode } from "react";
 
 interface LinkItem {
@@ -12,16 +12,16 @@ export default function Sidebar({ open }: { open: boolean }) {
   const links: LinkItem[] = [
     { label: "Inicio", icon: <Home />, href: "/" },
     { label: "Seguimiento", icon: <Users />, href: "/AboutPage" },
-    { label: "Historial", icon: <Settings />, href: "/DocsPage" },
-    { label: "Formatos", icon: <Settings />, href: "/DocsPage" },
-    { label: "MiChat", icon: <Settings />, href: "/DocsPage" },
-    { label: "Cerrar Sesion", icon: <Settings />, href: "/DocsPage" },
+    { label: "Historial", icon: <FolderClock />, href: "/DocsPage" },
+    { label: "Formatos", icon: <Library />, href: "/DocsPage" },
+    { label: "MiChat", icon: <MessageCircle />, href: "/DocsPage" },
+    { label: "Cerrar Sesion", icon: <DoorOpen />, href: "/DocsPage" },
   ];
 
   return (
     <Card
       className={`
-        h-screen p-4 bg-gray-900 text-white transition-all duration-300
+        h-screen p-4 bg-gray-900 text-white transition-all duration-300 
         ${open ? "w-64" : "w-20"}
       `}
     >
@@ -38,7 +38,7 @@ export default function Sidebar({ open }: { open: boolean }) {
           <a
             key={index}
             href={item.href}
-            className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-700 transition"
+            className="flex items-center gap-3 p-3  hover:bg-gray-700 transition"
           >
             {item.icon}
             {open && <span>{item.label}</span>}
