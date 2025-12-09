@@ -12,7 +12,7 @@ interface LinkItem {
 export default function Sidebar({ open }: { open: boolean }) {
   const links: LinkItem[] = [
     { label: "Inicio", icon: <Home />, href: "/" },
-    { label: "Seguimiento", icon: <Users />, href: "/about" },
+    { label: "Seguimiento", icon: <Users />, href: "/seguimiento" },
     { label: "Historial", icon: <Clock />, href: "/docs" },
     { label: "Formatos", icon: <FileText />, href: "/format" },
     { label: "MiChat", icon: <MessageCircle />, href: "/blog" },
