@@ -33,6 +33,8 @@ export function DashboardCards() {
             cursor-pointer
             overflow-hidden
             rounded-2xl
+            w-62
+            mx-auto
           "
         >
 
