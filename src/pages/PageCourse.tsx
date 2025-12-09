@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { listar_cursos_area } from '@/api/CursosApi';
 import CursoInfo from '@/types/cursoCard';
 import { Card } from '@heroui/react';
+import { title } from "@/components";
 
 
 
@@ -36,7 +37,7 @@ function PageCourse() {
     <DefaultLayout>
         <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
         <div className="inline-block max-w-lg text-center justify-center">
-          {/* <h1 className={title()}>Seguimiento de Áreas</h1> */}
+          <h1 className={title()}>Seguimiento de Áreas</h1>
         </div>
 
         <div className="flex flex-wrap justify-center gap-6 max-w-6xl">
