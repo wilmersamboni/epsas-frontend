@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
-import {IndexPage, DocsPage, PricingPage, BlogPage, AboutPage} from "@/pages";
+import {IndexPage, DocsPage, PricingPage, BlogPage, AboutPage, PageCourse} from "@/pages";
+
 // import IndexPage from "@/pages/index";
 // import DocsPage from "@/pages/docs";
 // import PricingPage from "@/pages/pricing";
@@ -14,6 +15,7 @@ function App() {
       <Route element={<PricingPage />} path="/format" />
       <Route element={<BlogPage />} path="/blog" />
       <Route element={<AboutPage />} path="/seguimiento" />
+      <Route element={< PageCourse/>} path="/area-detail/:idArea" />
     </Routes>
   );
 }

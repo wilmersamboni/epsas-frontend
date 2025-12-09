@@ -1,56 +1,49 @@
-import { title } from "@/components";
-import DefaultLayout from "@/layouts/default";
-import { Card } from "@heroui/react";
-import { useEffect, useState } from "react";
-import { listar_areas } from "@/api/AreasApi";
-import { Area } from "@/types/areaCard";
-import { Link } from 'react-router-dom';
+import DefaultLayout from '@/layouts/default'
+import { useEffect, useState } from 'react';
+import { listar_cursos_area } from '@/api/CursosApi';
+import CursoInfo from '@/types/cursoCard';
+import { Card } from '@heroui/react';
 
-export default function AboutPage() {
-  const [areas, setAreas] = useState<Area[]>([]);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function cargarAreas() {
-      try {
-        const data = await listar_areas({});
-        setAreas(data);
-      } catch (e) {
-        console.error("fallo al obtener las areas ", e);
-        setError("Error al cargar las Áreas. Por favor, intente más tarde");
+
+function PageCourse() {
+    const [cursos, setCursos] = useState<CursoInfo[]>([]);
+      const [error, setError] = useState<string | null>(null);
+    
+      useEffect(() => {
+        async function cargarCursos() {
+          try {
+            const data = await listar_cursos_area({});
+            setCursos(data);
+          } catch (e) {
+            console.error("fallo al obtener las areas ", e);
+            setError("Error al cargar los Cursos. Por favor, intente más tarde");
+          }
+        }
+        cargarCursos();
+      }, []);
+    
+      if (error) {
+        return (
+          <DefaultLayout>
+            <div className="text-center py-10 text-red-500">
+              <p className="text-2xl font-bold"> {error}</p>
+            </div>
+          </DefaultLayout>
+        );
       }
-    }
-    cargarAreas();
-  }, []);
-
-  if (error) {
-    return (
-      <DefaultLayout>
-        <div className="text-center py-10 text-red-500">
-          <p className="text-2xl font-bold">⚠️ {error}</p>
-        </div>
-      </DefaultLayout>
-    );
-  }
-
   return (
     <DefaultLayout>
-      <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
+        <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
         <div className="inline-block max-w-lg text-center justify-center">
-          <h1 className={title()}>Seguimiento de Áreas</h1>
+          {/* <h1 className={title()}>Seguimiento de Áreas</h1> */}
         </div>
 
         <div className="flex flex-wrap justify-center gap-6 max-w-6xl">
-          {areas.map((area) => (
-            <Link 
-                        key={area.id_area || area.nombre} 
-                        // Usar 'to' en lugar de 'href'
-                        to={`/area-detail/${area.id_area}`} 
-                        // La propiedad 'passHref' no es necesaria en React Router
-                    >
+          {cursos.map((curso) => (
             
-            <div key={area.id_area || area.nombre} className="mb-4">
-
+            
+            <div key={curso.id_curso || curso.codigo} className="mb-4">
               <Card 
                 className="
                   group
@@ -80,7 +73,7 @@ export default function AboutPage() {
 
                     {/* Título del área */}
                     <h3 className="text-white text-xl font-bold tracking-tight group-hover:text-blue-300 transition-colors duration-300">
-                      {area.nombre || 'Área sin Nombre'}
+                      {curso.codigo || 'Curso sin codigo'}
                     </h3>
 
                     
@@ -128,12 +121,10 @@ export default function AboutPage() {
                   </svg>
                 </div>
               </Card>
-              
             </div>
-            </Link>
           ))}
 
-          {areas.length === 0 && (
+          {cursos.length === 0 && (
             <div className="text-center py-12">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-800 mb-4">
                 <svg 
@@ -152,10 +143,12 @@ export default function AboutPage() {
               </div>
               <p className="text-gray-500 text-lg">No hay áreas registradas</p>
             </div>
-            
           )}
         </div>
       </section>
+
     </DefaultLayout>
-  );
+  )
 }
+
+export default PageCourse
