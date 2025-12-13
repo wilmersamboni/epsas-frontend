@@ -5,6 +5,7 @@ import {
   PricingPage,
   BlogPage,
   AboutPage,
+  ForgotPasswordPage
 } from "@/pages";
 
 import LoginPage from "@/pages/LoginPage";
@@ -61,6 +62,7 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route element={<ForgotPasswordPage />} path="/ForgotPassword" />
     </Routes>
   );
 }
