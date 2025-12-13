@@ -28,12 +28,7 @@ export default function Sidebar({ open }: { open: boolean }) {
     { label: "Seguimiento", icon: <Users />, href: "/seguimiento" },
     { label: "Historial", icon: <Clock />, href: "/docs" },
     { label: "Formatos", icon: <FileText />, href: "/format" },
-    { label: "MiChat", icon: <MessageCircle />, href: "/blog" },
-    {
-      label: "Recuperar Contraseña",
-      icon: <KeyRound />,
-      href: "/ForgotPassword",
-    },
+    { label: "MiChat", icon: <MessageCircle />, href: "/blog" }
   ];
 
   const handleLogout = () => {
