@@ -4,25 +4,41 @@ import { listar_cursos_area } from '@/api/CursosApi';
 import CursoInfo from '@/types/cursoCard';
 import { Card } from '@heroui/react';
 import { title } from "@/components";
+import { useParams } from 'react-router-dom';
 
 
 
 function PageCourse() {
+  const { idArea } = useParams<{ idArea: string }>();
     const [cursos, setCursos] = useState<CursoInfo[]>([]);
       const [error, setError] = useState<string | null>(null);
     
       useEffect(() => {
+        // 💡 2. Validar que el ID exista y sea un número válido
+        if (!idArea) {
+            setError("ID de Área no especificado en la URL.");
+            return;
+        }
+
+        const areaIdNumber = Number(idArea);
+        if (isNaN(areaIdNumber) || areaIdNumber <= 0) {
+            setError("ID de Área no válido.");
+            return;
+        }
+        
         async function cargarCursos() {
           try {
-            const data = await listar_cursos_area({});
+            // 💡 3. Llamar a la API con el ID válido
+            // Pasa el número a la API
+            const data = await listar_cursos_area(areaIdNumber); 
             setCursos(data);
           } catch (e) {
-            console.error("fallo al obtener las areas ", e);
+            console.error("fallo al obtener los cursos: ", e);
             setError("Error al cargar los Cursos. Por favor, intente más tarde");
           }
         }
         cargarCursos();
-      }, []);
+      }, [idArea]);
     
       if (error) {
         return (
