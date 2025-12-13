@@ -192,20 +192,20 @@ export default function SettingsPage() {
         </div>
 
         {/* Contenido de configuración */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6">
-          <div className="max-w-6xl mx-auto">
+        <main className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+          <div className="h-full p-4">
+          <div className="max-w-6xl mx-auto h-full flex flex-col">
             
-            <div className="mb-8">
-              <h1 className="text-4xl font-bold text-white mb-2">Configuración</h1>
+            <div className="mb-4">
+              <h1 className="text-3xl font-bold text-white mb-1">Configuración</h1>
               <p className="text-blue-200">Administra tu cuenta y preferencias</p>
             </div>
 
-            <div className="grid md:grid-cols-4 gap-6">
+            <div className="grid md:grid-cols-4 gap-4 flex-1 overflow-hidden">
               
               {/* sidebar de configuracion*/}
-              <div className="md:col-span-1">
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 border border-white/20">
+              <div className="md:col-span-1 overflow-y-auto">
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-3 border border-white/20 h-full sticky top-0">
                   {tabs.map((tab) => {
                     const Icon = tab.icon;
                     return (
@@ -227,15 +227,15 @@ export default function SettingsPage() {
               </div>
 
               {/* contenido principal, lado izquierdo */}
-              <div className="md:col-span-3 ">
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
+              <div className="md:col-span-3 overflow-y-auto">
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 h-full">
                   
                   {/* perfil del sidebar de configuracion */}
                   {activeTab === 'perfil' && (
-                    <div className="space-y-6">
-                      <h2 className="text-2xl font-bold text-white mb-6">Información Personal</h2>
+                    <div className="space-y-4">
+                      <h2 className="text-2xl font-bold text-white mb-4">Información Personal</h2>
                       
-                      <div className="flex items-center gap-6 mb-8">
+                      <div className="flex items-center gap-6 mb-6">
                         <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-3xl font-bold">
                           DS
                         </div>
@@ -308,8 +308,8 @@ export default function SettingsPage() {
 
                   {/* seguridad del sidebar de configuracion */}
                   {activeTab === 'seguridad' && (
-                    <div className="space-y-6">
-                      <h2 className="text-2xl font-bold text-white mb-6">Seguridad y Contraseña</h2>
+                    <div className="space-y-4">
+                      <h2 className="text-2xl font-bold text-white mb-4">Seguridad y Contraseña</h2>
                       
                       <div className="space-y-4">
                         <div>
@@ -356,8 +356,8 @@ export default function SettingsPage() {
 
                   {/* administrar Centros  del sidebar de configuracion*/}
                   {activeTab === 'administrar' && (
-                    <div className="space-y-6">
-                      <div className="flex justify-between items-center mb-6">
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center mb-4">
                         <h2 className="text-2xl font-bold text-white">Centros de Formación</h2>
                         <button
                           onClick={() => setMostrarFormulario(!mostrarFormulario)}
@@ -455,8 +455,8 @@ export default function SettingsPage() {
 
                   {/* administrar sedes  del sidebar de configuracion*/}
                   {activeTab === 'sede' && (
-                    <div className="space-y-6">
-                      <div className="flex justify-between items-center mb-6">
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center mb-4">
                         <h2 className="text-2xl font-bold text-white">Sedes</h2>
                         <button
                           onClick={() => setMostrarFormularioSede(!mostrarFormularioSede)}
@@ -583,7 +583,7 @@ export default function SettingsPage() {
 
                   {/* botones de acción (solo para perfil y seguridad) */}
                   {(activeTab === 'perfil' || activeTab === 'seguridad') && (
-                    <div className="mt-8 flex justify-end gap-4">
+                    <div className="mt-4 flex justify-end gap-4">
                       <button
                         onClick={() => window.history.back()}
                         className="px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition"
