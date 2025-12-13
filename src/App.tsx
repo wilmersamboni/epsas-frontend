@@ -36,7 +36,7 @@ function App() {
       />
 
       <Route
-        path="/pricing"
+        path="/format"
         element={
           <ProtectedRoute>
             <PricingPage />
@@ -54,7 +54,7 @@ function App() {
       />
 
       <Route
-        path="/about"
+        path="/seguimiento"
         element={
           <ProtectedRoute>
             <AboutPage />
