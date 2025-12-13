@@ -94,18 +94,6 @@ const PasswordRecovery: React.FC = () => {
                   Enviar Enlace de Recuperación
                 </button>
               </div>
-
-              <div className="mt-8 text-center">
-                <p className="text-sm text-gray-600">
-                  ¿Recordaste tu contraseña?{' '}
-                  <button 
-                    onClick={() => {}}
-                    className="text-blue-600 font-medium hover:text-blue-700 transition-colors bg-transparent border-none cursor-pointer"
-                  >
-                    Iniciar Sesión
-                  </button>
-                </p>
-              </div>
             </>
           ) : (
             //despues de enviar el correo muestra la validacion
