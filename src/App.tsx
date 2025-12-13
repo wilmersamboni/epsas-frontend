@@ -1,13 +1,7 @@
-import { Routes, Route } from "react-router-dom";
-import {
-  IndexPage,
-  DocsPage,
-  PricingPage,
-  BlogPage,
-  AboutPage,
-  ForgotPasswordPage,
-  PageCourse
-} from "@/pages";
+
+import { Route, Routes } from "react-router-dom";
+import {IndexPage, DocsPage, PricingPage, BlogPage, AboutPage, PageCourse, ForgotPasswordPage, SettingsPage} from "@/pages";
+
 
 import LoginPage from "@/pages/LoginPage";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -66,6 +60,7 @@ function App() {
       <Route element={< PageCourse/>} path="/area-detail/:idArea" />
 
       <Route element={<ForgotPasswordPage />} path="/ForgotPassword" />
+      <Route element={<SettingsPage />} path="/settings" />
     </Routes>
   );
 }
