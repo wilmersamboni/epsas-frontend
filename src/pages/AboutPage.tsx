@@ -4,11 +4,17 @@ import { Card } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { listar_areas } from "@/api/AreasApi";
 import { Area } from "@/types/areaCard";
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
+import CardMenu from "@/components/CardMenu";
+import AreaFormModal from "@/components/ModalMenu";
 
 export default function AboutPage() {
   const [areas, setAreas] = useState<Area[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [areaSeleccionada, setAreaSeleccionada] = useState<Area | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function cargarAreas() {
@@ -42,16 +48,10 @@ export default function AboutPage() {
 
         <div className="flex flex-wrap justify-center gap-6 max-w-6xl">
           {areas.map((area) => (
-            <Link 
-                        key={area.id_area || area.nombre} 
-                        // Usar 'to' en lugar de 'href'
-                        to={`/area-detail/${area.id_area}`} 
-                        // La propiedad 'passHref' no es necesaria en React Router
-                    >
-            
             <div key={area.id_area || area.nombre} className="mb-4">
-
               <Card 
+                isPressable
+                onPress={() => navigate(`/area-detail/${area.id_area}`)}
                 className="
                   group
                   w-72 h-44 p-6
@@ -67,45 +67,42 @@ export default function AboutPage() {
                   cursor-pointer
                   relative
                   overflow-hidden 
-                  
                 "
               >
-                {/* Efecto de brillo en hover */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -translate-x-full group-hover:translate-x-full" />
+                {/* CardMenu con z-30 para estar por encima */}
+                <CardMenu
+                  onEditar={() => {
+                    setAreaSeleccionada(area);
+                    setModalOpen(true);
+                  }}
+                  onVer={() => navigate(`/area-detail/${area.id_area}`)}
+                  onEliminar={() => console.log("Eliminar", area.id_area)}
+                />
                 
                 {/* Contenido */}
                 <div className="relative z-10">
                   <div className="flex items-center gap-3 mb-3">
-                    
-
-                    {/* Título del área */}
                     <h3 className="text-white text-xl font-bold tracking-tight group-hover:text-blue-300 transition-colors duration-300">
                       {area.nombre || 'Área sin Nombre'}
                     </h3>
-
-                    
                   </div>
-                  {/* Icono decorativo */}
-                    <div className="w-13 h-13 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                      <svg 
-                        className="w-10 h-10 text-white" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                      >
-                        <path 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          strokeWidth={2} 
-                          d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" 
-                        />
-                      </svg>
-                    </div>
 
-                  {/* Descripción o información adicional
-                  <p className="text-gray-400 text-sm leading-relaxed group-hover:text-gray-300 transition-colors duration-300">
-                    Haz clic para ver el seguimiento detallado
-                  </p> */}
+                  {/* Icono decorativo */}
+                  <div className="w-13 h-13 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <svg 
+                      className="w-10 h-10 text-white" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} 
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" 
+                      />
+                    </svg>
+                  </div>
                 </div>
 
                 {/* Indicador de acción */}
@@ -128,9 +125,7 @@ export default function AboutPage() {
                   </svg>
                 </div>
               </Card>
-              
             </div>
-            </Link>
           ))}
 
           {areas.length === 0 && (
@@ -152,10 +147,18 @@ export default function AboutPage() {
               </div>
               <p className="text-gray-500 text-lg">No hay áreas registradas</p>
             </div>
-            
           )}
         </div>
       </section>
+
+      <AreaFormModal
+        isOpen={modalOpen}
+        area={areaSeleccionada ?? undefined}
+        onClose={() => {
+          setModalOpen(false);
+          setAreaSeleccionada(null);
+        }}
+      />
     </DefaultLayout>
   );
 }
