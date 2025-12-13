@@ -1,8 +1,11 @@
 import { Popover, PopoverTrigger, PopoverContent } from "@heroui/popover";
 import { Avatar } from "@heroui/avatar";
 import { User, Settings, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom"; // 👈 Importar
 
 export default function PerfilPopover() {
+  const navigate = useNavigate(); // 👈 Hook de navegación
+
   return (
     <Popover placement="right-start">
       <PopoverTrigger>
@@ -23,7 +26,6 @@ export default function PerfilPopover() {
           text-white
         "
       >
-        {/* Info de usuario */}
         <div className="flex items-center gap-3 border-b border-white/20 pb-3">
           <Avatar
             name="Daniela"
@@ -36,16 +38,20 @@ export default function PerfilPopover() {
           </div>
         </div>
 
-        {/* Acciones */}
         <div className="mt-3 flex flex-col gap-2">
-          <button className="flex items-center gap-2 p-2 hover:bg-white/10 rounded-lg transition">
+          <button 
+            onClick={() => navigate('/profile')} // 👈 Navegar a perfil
+            className="flex items-center gap-2 p-2 hover:bg-white/10 rounded-lg transition"
+          >
             <User size={18} /> Mi perfil
           </button>
 
-          <button className="flex items-center gap-2 p-2 hover:bg-white/10 rounded-lg transition">
+          <button 
+            onClick={() => navigate('/settings')} // 👈 Navegar a configuración
+            className="flex items-center gap-2 p-2 hover:bg-white/10 rounded-lg transition"
+          >
             <Settings size={18} /> Configuración
           </button>
-
         </div>
       </PopoverContent>
     </Popover>
