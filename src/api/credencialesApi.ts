@@ -2,6 +2,7 @@ import axios from "axios";
 
 const axiosClient = axios.create({
   baseURL: "http://localhost:3000",
+  withCredentials: true,
 });
 
 export type Usuario = {
@@ -10,7 +11,7 @@ export type Usuario = {
 };
 
 export type LoginResponse = {
-  token: string;
+  
   usuario: Usuario;
 };
 

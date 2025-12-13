@@ -23,14 +23,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = async (data: { login: string; password: string }) => {
     const resp = await validarCredencial(data);
 
-    localStorage.setItem("token", resp.token);
+    // ✅ SOLO guardas datos públicos
     localStorage.setItem("user", JSON.stringify(resp.usuario));
-
     setUser(resp.usuario);
   };
 
-  const logout = () => {
-    localStorage.clear();
+  const logout = async () => {
+    // opcional: llamar endpoint /logout
+    localStorage.removeItem("user");
     setUser(null);
   };
 
