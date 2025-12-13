@@ -5,13 +5,16 @@ import CursoInfo from '@/types/cursoCard';
 import { Card } from '@heroui/react';
 import { title } from "@/components";
 import { useParams } from 'react-router-dom';
-
-
+import CardMenu from "@/components/CardMenu";
+import { useNavigate } from 'react-router-dom';
 
 function PageCourse() {
   const { idArea } = useParams<{ idArea: string }>();
     const [cursos, setCursos] = useState<CursoInfo[]>([]);
       const [error, setError] = useState<string | null>(null);
+        const [modalOpen, setModalOpen] = useState(false);
+        const [areaSeleccionada, setAreaSeleccionada] = useState<CursoInfo | null>(null);
+        const navigate = useNavigate();
     
       useEffect(() => {
         // 💡 2. Validar que el ID exista y sea un número válido
@@ -62,6 +65,8 @@ function PageCourse() {
             
             <div key={curso.id_curso || curso.codigo} className="mb-4">
               <Card 
+                isPressable
+                onPress={() => navigate(`/area-detail/${curso.id_curso}`)}
                 className="
                   group
                   w-72 h-44 p-6
@@ -80,6 +85,14 @@ function PageCourse() {
                   
                 "
               >
+                <CardMenu
+                                  onEditar={() => {
+                                    setAreaSeleccionada(curso);
+                                    setModalOpen(true);
+                                  }}
+                                  onVer={() => navigate(`/area-detail/${curso.id_curso}`)}
+                                  onEliminar={() => console.log("Eliminar", curso.id_curso)}
+                                />
                 {/* Efecto de brillo en hover */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -translate-x-full group-hover:translate-x-full" />
                 

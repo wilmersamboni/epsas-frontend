@@ -16,18 +16,29 @@ export default function AboutPage() {
   const [areaSeleccionada, setAreaSeleccionada] = useState<Area | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
+
     async function cargarAreas() {
       try {
         const data = await listar_areas({});
         setAreas(data);
+        setError(null);
       } catch (e) {
         console.error("fallo al obtener las areas ", e);
         setError("Error al cargar las Áreas. Por favor, intente más tarde");
       }
     }
-    cargarAreas();
-  }, []);
+    useEffect(() => {
+    cargarAreas(); // Llama a la función al montar
+  }, []);
+
+const handleGuardadoExitoso = () => {
+    // Cierra el modal, limpia la selección y recarga los datos
+    setModalOpen(false);
+    setAreaSeleccionada(null);
+    cargarAreas(); 
+  };
+
+  
 
   if (error) {
     return (
@@ -158,7 +169,8 @@ export default function AboutPage() {
           setModalOpen(false);
           setAreaSeleccionada(null);
         }}
+        onGuardadoExitoso={handleGuardadoExitoso}
       />
     </DefaultLayout>
   );
-}
+  }

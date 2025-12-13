@@ -48,26 +48,32 @@ export default function CardMenu({
             shadow-lg
           "
         >
+            <div>
           <button
             onClick={onEditar}
             className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700"
           >
             ✏️ Editar
           </button>
+          </div>
 
+        <div>
           <button
             onClick={onVer}
             className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700"
           >
             🔍 Ver detalles
           </button>
-
-          <button
+          </div>
+            <div>
+                <button
             onClick={onEliminar}
             className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-red-500/10"
           >
             🗑️ Eliminar
           </button>
+            </div>
+          
         </div>
       )}
     </div>
