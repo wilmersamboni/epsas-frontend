@@ -1,5 +1,5 @@
 import { Card } from "@heroui/react";
-import {  Users, Settings, Home, FileText, Clock, MessageCircle, LogOut } from "lucide-react";
+import {  Users, Settings, Home, FileText, Clock, MessageCircle, LogOut, KeyRound } from "lucide-react";
 import { useState, ReactNode } from "react";
 import PerfilPopover from "@/components/perfil";
 
@@ -16,6 +16,7 @@ export default function Sidebar({ open }: { open: boolean }) {
     { label: "Historial", icon: <Clock />, href: "/docs" },
     { label: "Formatos", icon: <FileText />, href: "/format" },
     { label: "MiChat", icon: <MessageCircle />, href: "/blog" },
+    { label: "Recuperar Contraseña", icon: <KeyRound />, href: "/ForgotPassword" },
   ];
 
   const logoutLink: LinkItem = { label: "Cerrar Sesion", icon: <LogOut />, href: "/DocsPage" };
