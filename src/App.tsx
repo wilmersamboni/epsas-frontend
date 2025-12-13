@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import {IndexPage, DocsPage, PricingPage, BlogPage, AboutPage, PageCourse, ForgotPasswordPage} from "@/pages";
+import {IndexPage, DocsPage, PricingPage, BlogPage, AboutPage, PageCourse, ForgotPasswordPage, SettingsPage} from "@/pages";
 
 // import IndexPage from "@/pages/index";
 // import DocsPage from "@/pages/docs";
@@ -17,6 +17,7 @@ function App() {
       <Route element={<AboutPage />} path="/seguimiento" />
       <Route element={< PageCourse/>} path="/area-detail/:idArea" />
       <Route element={<ForgotPasswordPage />} path="/ForgotPassword" />
+      <Route element={<SettingsPage />} path="/settings" />
     </Routes>
   );
 }
