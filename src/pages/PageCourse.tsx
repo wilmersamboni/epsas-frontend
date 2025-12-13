@@ -56,7 +56,7 @@ function PageCourse() {
     <DefaultLayout>
         <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
         <div className="inline-block max-w-lg text-center justify-center">
-          <h1 className={title()}>Seguimiento de Áreas</h1>
+          <h1 className={title()}>Seguimiento de Cursos</h1>
         </div>
 
         <div className="flex flex-wrap justify-center gap-6 max-w-6xl">
@@ -171,7 +171,7 @@ function PageCourse() {
                   />
                 </svg>
               </div>
-              <p className="text-gray-500 text-lg">No hay áreas registradas</p>
+              <p className="text-gray-500 text-lg">No hay cursos registradas</p>
             </div>
           )}
         </div>
