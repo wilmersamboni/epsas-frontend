@@ -1,22 +1,29 @@
 import { Card, CardHeader, CardBody } from "@heroui/card";
+import { useNavigate } from "react-router-dom";
+
 
 export function DashboardCards() {
+  const navigate = useNavigate();  
   const cards = [
     {
       title: "Seguimiento",
       img: "/img/biotic.jpg",
+      path:"/seguimiento"
     },
     {
       title: "Historial",
       img: "/img/biotic.jpg",
+      path:"/docs"
     },
     {
       title: "Formatos",
       img: "/img/biotic.jpg",
+      path:"/format"
     },
     {
       title: "MiChat",
       img: "/img/biotic.jpg",
+      path:"/blog"
     }
   ];
 
@@ -26,6 +33,7 @@ export function DashboardCards() {
         <Card
           key={index}
           isPressable
+          onPress={() => navigate(card.path)}         
           className="
             transition-all duration-300 
             hover:shadow-2xl 
@@ -54,7 +62,7 @@ export function DashboardCards() {
           {/* Texto */}
           <CardHeader className="flex flex-col items-start p-4">
             <h3 className="text-lg font-semibold">{card.title}</h3>
-            <p className="text-3xl font-bold">{card.value}</p>
+            {/* <p className="text-3xl font-bold">{card.value}</p> */}
           </CardHeader>
 
         </Card>
