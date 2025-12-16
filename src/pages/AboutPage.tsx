@@ -2,7 +2,7 @@ import { title } from "@/components";
 import DefaultLayout from "@/layouts/default";
 import { Card } from "@heroui/react";
 import { useEffect, useState } from "react";
-import { listar_areas } from "@/api/AreasApi";
+import { eliminar_area, listar_areas } from "@/api/AreasApi";
 import { Area } from "@/types/areaCard";
 import { useNavigate } from 'react-router-dom';
 
@@ -37,6 +37,20 @@ const handleGuardadoExitoso = () => {
     setAreaSeleccionada(null);
     cargarAreas(); 
   };
+
+const handleEliminar= async(area: Area)=>{
+  const confirmar= window.confirm( "Seguro que deseas eliminar el area")
+
+  if(!confirmar) return;
+  try{
+    await eliminar_area(area.id_area);
+    cargarAreas()
+    
+  }catch(error){
+      console.error("Error al eliminar el area", error)
+      alert("No se pudo eliminar el area")
+    }
+}
 
   
 
@@ -86,8 +100,11 @@ const handleGuardadoExitoso = () => {
                     setAreaSeleccionada(area);
                     setModalOpen(true);
                   }}
-                  onVer={() => navigate(`/area-detail/${area.id_area}`)}
-                  onEliminar={() => console.log("Eliminar", area.id_area)}
+                  onEliminar={(e) => {
+                     e.stopPropagation(); // 👈 evita que navegue al detalle
+                      handleEliminar(area);
+                    
+                  }}
                 />
                 
                 {/* Contenido */}

@@ -12,3 +12,8 @@ export const actualizar_area= async(id_area, datos)=>{
     const responde = await conexionDb.put(`/area/actualizar_jwsv/${id_area}`,datos)
     return responde.data
 }
+
+export const eliminar_area= async(id_area:Number)=>{
+    const responde = await conexionDb.delete(`/area/eliminar_jwsv/${id_area}`)
+    return  responde.data
+}
