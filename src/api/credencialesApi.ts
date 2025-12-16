@@ -1,9 +1,27 @@
+import axios from "axios";
 
-import conexionDb from "./axiosClient";
+const axiosClient = axios.create({
+  baseURL: "http://localhost:3000",
+  withCredentials: true,
+});
 
+export type Usuario = {
+  nombre?: string;
+  cargo?: string;
+};
 
-export const validarCredencial= async(credenciales)=>{
-    const responde= await conexionDb.post('/token/generar_token_jwsv', credenciales)
-    return responde.data
+export type LoginResponse = {
+  
+  usuario: Usuario;
+};
 
-}
+export const validarCredencial = async (data: {
+  login: string;
+  password: string;
+}): Promise<LoginResponse> => {
+  const resp = await axiosClient.post<LoginResponse>(
+    "/token/generar_token_jwsv",
+    data
+  );
+  return resp.data;
+};

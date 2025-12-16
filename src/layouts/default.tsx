@@ -2,50 +2,51 @@ import { useState } from "react";
 import { Link } from "@heroui/link";
 import { Navbar } from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
-import { Menu } from "lucide-react";
+// import { Menu } from "lucide-react";
+import { Footer } from "@/components/Footer";
+
 
 export default function DefaultLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="flex h-screen">
       
       {/* sidebar */}
-      <Sidebar open={open} />
+      <div
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        className="h-screen"
+      >
+        <Sidebar open={open} />
+      </div>
 
-      <div className="flex flex-col flex-grow transition-all duration-300"
+      <div className="flex flex-col flex-1 min-h-screen"
         style={{ marginLeft: open ? 0 : 0 }}
       >
-        
+
         {/* NAVBAR */}
         <div className="flex items-center px-4 h-16 border-b bg-white">
-
-          {/* Botón de abrir/cerrar */}
-          <button
-            onClick={() => setOpen(!open)}
-            className="mr-4"
-          >
-            <Menu size={30} />
-          </button>
-
-          {/* Navbar real */}
           <Navbar />
         </div>
 
+        
         {/* CONTENIDO */}
-        <main className="p-6 flex-grow">{children}</main>
+        <main className="p-6 flex-1">{children}</main>
 
-        <footer className="p-4 text-center">
-          <Link isExternal href="https://heroui.com">
-            Epsas
-          </Link>
-        </footer>
 
+
+        {/* FOOTER */}
+          <Footer className="rounded-r-xl" />
       </div>
     </div>
   );
 }
+
+
+
+

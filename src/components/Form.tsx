@@ -1,118 +1,157 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { userSchema } from '../schemas/user';
-import { validarCredencial } from '../api/credencialesApi'; // Tu fetcher de Axios
-import { useMutation } from '@tanstack/react-query'; // 🚨 IMPORTANTE: Importar useMutation
-import { z } from 'zod';
+import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
+import { User, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
 
-// 1.  Definir el tipo de datos inferido del esquema Zod
-// Este tipo debe coincidir con lo que esperas en el formulario y lo que envías al backend
-type FormDataType = z.infer<typeof userSchema>; 
+export default function Form() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-type FormProps = {
-    onLoginSuccess: () => void;
-};
+  const [loginValue, setLoginValue] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
-// -----------------------------------------------------------
+  const redirectTo = (location.state as any)?.from?.pathname || "/";
 
-function Form({ onLoginSuccess }: FormProps) {
-    
-    // 2. Usar el tipo de datos real del formulario (FormDataType)
-    const {
-        register,
-        handleSubmit,
-        formState: { errors, isSubmitting }, // <-- Añadimos isSubmitting
-        reset, // <-- Útil para limpiar el formulario
-    } = useForm<FormDataType>({ 
-        resolver: zodResolver(userSchema),
-    });
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setServerError(null);
 
-    // 3. Configuración de useMutation
-    const loginMutation = useMutation({
-        // La función Axios que se ejecutará al llamar a mutate()
-        mutationFn: validarCredencial, 
-        
-        onSuccess: (data) => {
-            // Manejo de la respuesta exitosa (data es lo que devuelve Axios)
-            const token = data.token; // Asumimos que el servidor devuelve un objeto con la propiedad 'token'
-            if (token) {
-                localStorage.setItem('authToken', token);
-                console.log('✅ Login exitoso. Token almacenado.');
-                onLoginSuccess(); // Llama a la función de prop para redirigir/cambiar estado
-            } else {
-                console.warn('⚠️ Login exitoso, pero no se recibió un token.');
-                // Manejar este caso según la lógica de tu backend
-            }
-            reset(); // Opcional: limpiar el formulario
-        },
-        
-        onError: (error) => {
-            // Manejo de errores (ej. 401 Unauthorized)
-            console.error("❌ Error de autenticación:", error);
-            alert('Error al iniciar sesión. Verifica tus credenciales.');
-        },
-    });
+    if (!loginValue || !password) {
+      setServerError("Debes escribir usuario y contraseña.");
+      return;
+    }
 
-    // 4. Función de manejo del envío
-    const onSubmit = (data: FormDataType) => {
-        console.log("Datos a enviar:", data);
-        // Llama a la función de mutación con los datos validados
-        loginMutation.mutate(data);
-    };
+    try {
+      setSubmitting(true);
+      await login({
+        login: loginValue.trim(),
+        password,
+      });
+      navigate(redirectTo, { replace: true });
+    } catch (err: any) {
+      setServerError(err?.message || "Credenciales incorrectas.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-    return (
-        <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col justify-center items-center space-y-6 bg-white p-10 rounded-lg shadow-2xl w-full max-w-md"
-        >
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Iniciar Sesión</h2>
-            
-            {/* Campo Name */}
-            <div className="flex flex-col w-full">
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                    Name
-                </label>
-                <input
-                    {...register('login')} 
-                    id="name"
-                    type="text"
-                    placeholder="Tu nombre"
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.login ? 'border-red-500' : 'border-gray-300'}`}
-                />
-                {errors.login && <p className="text-red-500 text-xs mt-1">{errors.login.message}</p>}
-            </div>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
+      
+      {/* BLOBS */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500 rounded-full blur-3xl opacity-10 animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500 rounded-full blur-3xl opacity-10 animate-pulse delay-700"></div>
+      </div>
 
-            {/* Campo LastName */}
-            <div className="flex flex-col w-full">
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-                    Last Name
-                </label>
-                <input
-                    {...register('password')} 
-                    id="lastName"
-                    type="text" // Asumo que son cadenas, pero deberías usar 'password' si es una credencial real
-                    placeholder="Tu apellido"
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
-                />
-                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
-            </div>
-            
-            {/* Mostrar estado de carga de la mutación */}
-            {loginMutation.isPending && (
-                <p className="text-blue-500">Iniciando sesión...</p>
+      <div className="w-full max-w-6xl mx-auto grid md:grid-cols-2 relative z-10">
+
+        {/* IZQUIERDA */}
+        <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-12 flex flex-col justify-between rounded-l-3xl shadow-2xl text-white">
+          <div>
+            <h2 className="text-4xl font-bold mb-6">
+              Bienvenido de nuevo
+            </h2>
+            <p className="text-blue-100 text-lg mb-8">
+              Accede al sistema EPSAS y gestiona toda tu información desde un solo lugar.
+            </p>
+          </div>
+
+          <div className="text-sm text-blue-100">
+            © {new Date().getFullYear()} EPSAS · Todos los derechos reservados
+          </div>
+        </div>
+
+        {/* DERECHA */}
+        <div className="bg-white p-12 flex flex-col justify-center rounded-r-3xl shadow-2xl">
+          <form onSubmit={onSubmit}>
+            <h2 className="text-3xl font-bold text-gray-800 mb-3">
+              Iniciar Sesión
+            </h2>
+            <p className="text-gray-600 mb-8">
+              Ingresa tus credenciales para continuar
+            </p>
+
+            {serverError && (
+              <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-6 text-sm">
+                {serverError}
+              </div>
             )}
 
-            {/* Botón de Enviar */}
-            <button
-                type="submit"
-                // Deshabilitar si el formulario está en proceso de envío o si la mutación está pendiente
-                disabled={isSubmitting || loginMutation.isPending} 
-                className="w-full text-white bg-green-500 hover:bg-green-600 font-medium rounded-lg text-sm px-5 py-2.5 text-center mt-4 transition-colors disabled:opacity-50"
-            >
-                {loginMutation.isPending ? 'Conectando...' : 'Acceder'}
-            </button>
-        </form>
-    );
-}
+            {/* USUARIO */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Usuario
+              </label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  value={loginValue}
+                  onChange={(e) => setLoginValue(e.target.value)}
+                  placeholder="usuario1"
+                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                />
+              </div>
+            </div>
 
-export default Form;
+            {/* PASSWORD CON OJITO */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Contraseña
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="********"
+                  className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* OLVIDASTE */}
+            <div className="text-right mb-8">
+              <button
+                type="button"
+                onClick={() => navigate("/ForgotPassword")}
+                className="text-sm text-blue-600 font-medium hover:text-blue-700 transition"
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
+            </div>
+
+            {/* BOTÓN */}
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl disabled:opacity-50"
+            >
+              {submitting ? "Ingresando..." : "Ingresar"}
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
