@@ -8,7 +8,6 @@ interface CardMenuProps {
 
 export default function CardMenu({
   onEditar,
-  onVer,
   onEliminar,
 }: CardMenuProps) {
   const [abierto, setAbierto] = useState(false);
@@ -57,14 +56,7 @@ export default function CardMenu({
           </button>
           </div>
 
-        <div>
-          <button
-            onClick={onVer}
-            className="w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700"
-          >
-            🔍 Ver detalles
-          </button>
-          </div>
+        
             <div>
                 <button
             onClick={onEliminar}
