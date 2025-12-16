@@ -17,7 +17,7 @@ function PageCourse() {
         const [cursoSeleccionada, setCursoSeleccionada] = useState<CursoInfo | null>(null);
         const navigate = useNavigate();
     
-      useEffect(() => {
+      
         // 💡 2. Validar que el ID exista y sea un número válido
         if (!idArea) {
             setError("ID de Área no especificado en la URL.");
@@ -41,13 +41,15 @@ function PageCourse() {
             setError("Error al cargar los Cursos. Por favor, intente más tarde");
           }
         }
+useEffect(()=>{
         cargarCursos();
-      }, [idArea]);
+      }, []);
 
         const handleGuardadoExitoso = () => {
         // Cierra el modal, limpia la selección y recarga los datos
         setModalOpen(false);
         setCursoSeleccionada(null);
+         cargarCursos()
   
       };
 

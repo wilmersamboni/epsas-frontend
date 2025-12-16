@@ -6,7 +6,7 @@ export const listar_cursos_area = async (id_area)=>{
     return responde.data
 }
 
-export const actualizar_curso= async(id_curso, datos)=>{
+export const actualizar_curso= async(id_curso:Number, datos)=>{
     const responde= await conexionDb.put(`curso/actualizar_jwsv/${id_curso}`, datos)
     return responde.data
 }

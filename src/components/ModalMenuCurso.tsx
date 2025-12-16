@@ -15,20 +15,23 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { listar_areas } from "@/api/AreasApi";
-import {  actualizar_curso, listar_programas } from "@/api/CursosApi";
+import { actualizar_curso, listar_programas } from "@/api/CursosApi";
+import { listar_personas } from "@/api/PersonasApi";
+import Calendario from "./Calendar";
 
 /* =======================
    VALIDACIÓN
 ======================= */
-
 const areaSchema = z.object({
-  codigo: z.number().min(1, "El codigo es obligatorio"),
-  area: z.number({
-    required_error: "Debe seleccionar una Area",
-  }),
-  programa: z.number({
-    required_error: "Debe seleccionar una Area",
-  }),
+  codigo: z.number().min(1, "El código es obligatorio"),
+
+  area: z.number({ required_error: "Debe seleccionar un Área" }),
+  programa: z.number({ required_error: "Debe seleccionar un Programa" }),
+  persona: z.number({ required_error: "Debe seleccionar un Líder" }),
+
+  Fecha_inicio: z.string().min(1, "La fecha de inicio es obligatoria"),
+  Fecha_fin_lectiva: z.string().min(1, "La fecha fin lectiva es obligatoria"),
+  Fecha_fin_practica: z.string().min(1, "La fecha fin práctica es obligatoria"),
 });
 
 type CursoFormData = z.infer<typeof areaSchema>;
@@ -36,7 +39,6 @@ type CursoFormData = z.infer<typeof areaSchema>;
 /* =======================
    TIPOS
 ======================= */
-
 interface CursoFormModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -44,11 +46,11 @@ interface CursoFormModalProps {
     id_curso?: number;
     codigo?: number;
     fecha_inicio?: Date;
-    fecha_fin_lectiva?:Date;
-    fecha_ffin_practica?:Date;
+    fecha_fin_lectiva?: Date;
+    fecha_ffin_practica?: Date;
     area?: number;
-    programa?:number;
-    lider?:number;
+    programa?: number;
+    persona?: number;
   };
   onGuardadoExitoso: () => void;
 }
@@ -69,18 +71,15 @@ interface Lider {
 /* =======================
    COMPONENTE
 ======================= */
-
 export default function AreaFormModal({
   isOpen,
   onClose,
   curso,
   onGuardadoExitoso,
 }: CursoFormModalProps) {
-    
   const [areas, setAreas] = useState<Area[]>([]);
-  const [cargandoAreas, setCargandoAreas] = useState(false);
   const [programas, setProgramas] = useState<Programa[]>([]);
-  const [cargandoProgramas, setCargandoProgramas] = useState(false);
+  const [personas, setPersonas] = useState<Lider[]>([]);
 
   const {
     control,
@@ -90,67 +89,46 @@ export default function AreaFormModal({
   } = useForm<CursoFormData>({
     resolver: zodResolver(areaSchema),
     defaultValues: {
-      codigo: undefined,
-      area: undefined,
-      programa: undefined,
+      codigo: 0,
+      area: 0,
+      programa: 0,
+      persona: 0,
+      Fecha_inicio: "",
+      Fecha_fin_lectiva: "",
+      Fecha_fin_practica: "",
     },
   });
 
   /* =======================
-     CARGAR SEDES
+     CARGAR DATOS
   ======================= */
   useEffect(() => {
     if (!isOpen) return;
 
-    async function cargarAreas() {
-      setCargandoAreas(true);
-      try {
-        const data = await listar_areas({});
-        setAreas(data);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setCargandoAreas(false);
-      }
-    }
-
-    cargarAreas();
-    async function cargarProgramas() {
-      setCargandoProgramas(true);
-      try {
-        const data = await listar_programas({});
-        setProgramas(data);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setCargandoProgramas(false);
-      }
-    }
-
-    cargarProgramas();
-    // async function cargarAreas() {
-    //   setCargandoAreas(true);
-    //   try {
-    //     const data = await listar_areas({});
-    //     setAreas(data);
-    //   } catch (e) {
-    //     console.error(e);
-    //   } finally {
-    //     setCargandoAreas(false);
-    //   }
-    // }
-
-    // cargarAreas();
+    listar_areas({}).then(setAreas);
+    listar_programas({}).then(setProgramas);
+    listar_personas({}).then(setPersonas);
   }, [isOpen]);
 
   /* =======================
-     SETEAR VALORES AL EDITAR
+     RESET AL EDITAR
   ======================= */
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && curso) {
       reset({
-        codigo: curso?.codigo ?? undefined,
-        area: curso?.area,
+        codigo: curso.codigo ?? 0,
+        area: curso.area ?? 0,
+        programa: curso.programa ?? 0,
+        persona: curso.persona ?? 0,
+        Fecha_inicio: curso.fecha_inicio
+          ? new Date(curso.fecha_inicio).toISOString().split("T")[0]
+          : "",
+        Fecha_fin_lectiva: curso.fecha_fin_lectiva
+          ? new Date(curso.fecha_fin_lectiva).toISOString().split("T")[0]
+          : "",
+        Fecha_fin_practica: curso.fecha_ffin_practica
+          ? new Date(curso.fecha_ffin_practica).toISOString().split("T")[0]
+          : "",
       });
     }
   }, [curso, isOpen, reset]);
@@ -159,21 +137,21 @@ export default function AreaFormModal({
      SUBMIT
   ======================= */
   const onSubmit = async (data: CursoFormData) => {
-    try {
-      if (curso?.id_curso) {
-        const datosParaBackend = {
-            codigo: data.codigo,
-            fk_area: data.area, // Mapeamos 'sede' a 'fk_sede'
+    if (!curso?.id_curso) return;
 
-        };
-        await actualizar_curso(curso.id_curso, datosParaBackend);
-        onGuardadoExitoso();
-      } 
+    const datosParaBackend = {
+      codigo: data.codigo,
+      fecha_inicio: data.Fecha_inicio,
+      fecha_fin: data.Fecha_fin_practica,
+      fin_lectiva: data.Fecha_fin_lectiva,
+      fk_area: data.area,
+      fk_programa: data.programa,
+      lider: data.persona,
+    };
 
-      onClose();
-    } catch (e) {
-      console.error(e);
-    }
+    await actualizar_curso(curso.id_curso, datosParaBackend);
+    onGuardadoExitoso();
+    onClose();
   };
 
   /* =======================
@@ -184,163 +162,127 @@ export default function AreaFormModal({
       <ModalContent>
         {() => (
           <form onSubmit={handleSubmit(onSubmit)}>
-            <ModalHeader className="flex flex-col gap-1">
-              {curso?.id_curso ? "Editar Curso" : "Nueva Área"}
+            <ModalHeader>
+              {curso?.id_curso ? "Editar Curso" : "Nuevo Curso"}
             </ModalHeader>
 
             <ModalBody className="gap-4">
-              {/* NOMBRE */}
               <Controller
-                name="Codigo"
+                name="codigo"
                 control={control}
                 render={({ field }) => (
                   <Input
                     {...field}
                     type="number"
-                    label="Codigo del Curso"
-                    variant="bordered"
-                    isInvalid={!!errors.codigo}
-                    errorMessage={errors.codigo?.message}
-                  />
-                )}
-              />
-              {/* FECHA_INICIO */}
-              <Controller
-                name="Fecha_inicio"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="date"
-                    label="Fecha de inicio del Curso"
-                    variant="bordered"
-                    isInvalid={!!errors.codigo}
-                    errorMessage={errors.codigo?.message}
-                  />
-                )}
-              />
-              {/* FECHA FIN LECTIVA */}
-              <Controller
-                name="Fecha_fin_lectiva"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="date"
-                    label="Fecha fin etapa lectiva del Curso"
-                    variant="bordered"
-                    isInvalid={!!errors.codigo}
-                    errorMessage={errors.codigo?.message}
-                  />
-                )}
-              />
-              {/* FECHA FIN PRACTICA */}
-              <Controller
-                name="Fecha_fin_practica"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="date"
-                    label="Fecha fin etapa practica del Curso"
-                    variant="bordered"
-                    isInvalid={!!errors.codigo}
-                    errorMessage={errors.codigo?.message}
-                  />
-                )}
-              />
-              {/* FECHA FIN PRACTICA */}
-              <Controller
-                name="Fecha_fin_practica"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type="date"
-                    label="Fecha fin etapa practica del Curso"
-                    variant="bordered"
+                    label="Código del Curso"
+                    onChange={(e) =>
+                      field.onChange(Number(e.target.value))
+                    }
                     isInvalid={!!errors.codigo}
                     errorMessage={errors.codigo?.message}
                   />
                 )}
               />
 
-              {/* SEDE */}
+              <Controller
+                name="Fecha_inicio"
+                control={control}
+                render={({ field }) => (
+                  <Calendario
+                    {...field}
+                    label="Fecha inicio del curso"
+                    isInvalid={!!errors.Fecha_inicio}
+                    errorMessage={errors.Fecha_inicio?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                name="Fecha_fin_lectiva"
+                control={control}
+                render={({ field }) => (
+                  <Calendario
+                    {...field}
+                    label="Fecha fin lectiva"
+                    isInvalid={!!errors.Fecha_fin_lectiva}
+                    errorMessage={errors.Fecha_fin_lectiva?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                name="Fecha_fin_practica"
+                control={control}
+                render={({ field }) => (
+                  <Calendario
+                    {...field}
+                    label="Fecha fin práctica"
+                    isInvalid={!!errors.Fecha_fin_practica}
+                    errorMessage={errors.Fecha_fin_practica?.message}
+                  />
+                )}
+              />
+
               <Controller
                 name="area"
                 control={control}
                 render={({ field }) => (
                   <Select
-                    label="Area asociada"
-                    selectedKeys={
-                      field.value ? [String(field.value)] : []
+                    label="Área"
+                    selectedKeys={[String(field.value)]}
+                    onSelectionChange={(keys) =>
+                      field.onChange(Number([...keys][0]))
                     }
-                    onSelectionChange={(keys) => {
-                      const value = Number(Array.from(keys)[0]);
-                      field.onChange(value);
-                    }}
-                    isDisabled={cargandoAreas}
-                    variant="bordered"
                     isInvalid={!!errors.area}
                     errorMessage={errors.area?.message}
                   >
-                    {areas.map((area) => (
-                      <SelectItem key={area.id_area} value={area.id_area}>
-                        {area.nombre}
+                    {areas.map((a) => (
+                      <SelectItem key={a.id_area}>
+                        {a.nombre}
                       </SelectItem>
                     ))}
                   </Select>
                 )}
               />
-              {/* PROGRAMA */}
+
               <Controller
                 name="programa"
                 control={control}
                 render={({ field }) => (
                   <Select
-                    label="Programa asociado"
-                    selectedKeys={
-                      field.value ? [String(field.value)] : []
+                    label="Programa"
+                    selectedKeys={[String(field.value)]}
+                    onSelectionChange={(keys) =>
+                      field.onChange(Number([...keys][0]))
                     }
-                    onSelectionChange={(keys) => {
-                      const value = Number(Array.from(keys)[0]);
-                      field.onChange(value);
-                    }}
-                    isDisabled={cargandoProgramas}
-                    variant="bordered"
                     isInvalid={!!errors.programa}
                     errorMessage={errors.programa?.message}
                   >
-                    {programas.map((programa) => (
-                      <SelectItem key={programa.id_programa} value={programa.id_programa}>
-                        {programa.nombre}
+                    {programas.map((p) => (
+                      <SelectItem key={p.id_programa}>
+                        {p.nombre}
                       </SelectItem>
                     ))}
                   </Select>
                 )}
               />
-              {/* LIDER */}
+
               <Controller
-                name="lider"
+                name="persona"
                 control={control}
                 render={({ field }) => (
                   <Select
-                    label="Lider Encargado"
-                    selectedKeys={
-                      field.value ? [String(field.value)] : []
+                    label="Líder"
+                    selectedKeys={[String(field.value)]}
+                    onSelectionChange={(keys) =>
+                      field.onChange(Number([...keys][0]))
                     }
-                    onSelectionChange={(keys) => {
-                      const value = Number(Array.from(keys)[0]);
-                      field.onChange(value);
-                    }}
-                    isDisabled={cargandoAreas}
-                    variant="bordered"
-                    isInvalid={!!errors.area}
-                    errorMessage={errors.area?.message}
+                    isInvalid={!!errors.persona}
+                    errorMessage={errors.persona?.message}
                   >
-                    {areas.map((area) => (
-                      <SelectItem key={area.id_area} value={area.id_area}>
-                        {area.nombre}
+                    {personas.map((p) => (
+                      <SelectItem key={p.id_persona}>
+                        {p.nombre}
                       </SelectItem>
                     ))}
                   </Select>
@@ -352,12 +294,7 @@ export default function AreaFormModal({
               <Button variant="flat" onPress={onClose}>
                 Cancelar
               </Button>
-
-              <Button
-                color="primary"
-                type="submit"
-                isLoading={isSubmitting}
-              >
+              <Button color="primary" type="submit" isLoading={isSubmitting}>
                 Guardar
               </Button>
             </ModalFooter>
