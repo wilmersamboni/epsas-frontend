@@ -1,22 +1,23 @@
 import DefaultLayout from '@/layouts/default'
 import { useEffect, useState } from 'react';
-import { listar_cursos_area } from '@/api/CursosApi';
+import { listar_cursos_area, eliminar_curso } from '@/api/CursosApi';
 import CursoInfo from '@/types/cursoCard';
 import { Card } from '@heroui/react';
 import { title } from "@/components";
 import { useParams } from 'react-router-dom';
 import CardMenu from "@/components/CardMenu";
 import { useNavigate } from 'react-router-dom';
+import CursoFormModal from "@/components/ModalMenuCurso";
 
 function PageCourse() {
   const { idArea } = useParams<{ idArea: string }>();
     const [cursos, setCursos] = useState<CursoInfo[]>([]);
       const [error, setError] = useState<string | null>(null);
         const [modalOpen, setModalOpen] = useState(false);
-        const [areaSeleccionada, setAreaSeleccionada] = useState<CursoInfo | null>(null);
+        const [cursoSeleccionada, setCursoSeleccionada] = useState<CursoInfo | null>(null);
         const navigate = useNavigate();
     
-      useEffect(() => {
+      
         // 💡 2. Validar que el ID exista y sea un número válido
         if (!idArea) {
             setError("ID de Área no especificado en la URL.");
@@ -31,17 +32,44 @@ function PageCourse() {
         
         async function cargarCursos() {
           try {
-            // 💡 3. Llamar a la API con el ID válido
-            // Pasa el número a la API
+            
             const data = await listar_cursos_area(areaIdNumber); 
             setCursos(data);
+            setError(null);
           } catch (e) {
             console.error("fallo al obtener los cursos: ", e);
             setError("Error al cargar los Cursos. Por favor, intente más tarde");
           }
         }
+useEffect(()=>{
         cargarCursos();
-      }, [idArea]);
+      }, []);
+
+        const handleGuardadoExitoso = () => {
+        // Cierra el modal, limpia la selección y recarga los datos
+        setModalOpen(false);
+        setCursoSeleccionada(null);
+         cargarCursos()
+  
+      };
+
+      const handleEliminar= async(curso: CursoInfo
+      )=>{
+        const confirmar= window.confirm( "Seguro que deseas eliminar el curso")
+      
+        if(!confirmar) return;
+        try{
+          await eliminar_curso(curso.id_curso);
+          if (idArea) {
+          await listar_cursos_area(Number(idArea)).then(setCursos);
+    }
+          
+        }catch(error){
+            console.error("Error al eliminar el curso", error)
+            alert("No se pudo eliminar el curso")
+          }
+      }
+      
     
       if (error) {
         return (
@@ -87,11 +115,14 @@ function PageCourse() {
               >
                 <CardMenu
                                   onEditar={() => {
-                                    setAreaSeleccionada(curso);
+                                    setCursoSeleccionada(curso);
                                     setModalOpen(true);
                                   }}
-                                  onVer={() => navigate(`/area-detail/${curso.id_curso}`)}
-                                  onEliminar={() => console.log("Eliminar", curso.id_curso)}
+                                  
+                                  onEliminar={(e) => {
+                                  e.stopPropagation(); 
+                                  handleEliminar(curso);
+                                }}
                                 />
                 {/* Efecto de brillo en hover */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -translate-x-full group-hover:translate-x-full" />
@@ -177,6 +208,15 @@ function PageCourse() {
         </div>
       </section>
 
+      <CursoFormModal
+              isOpen={modalOpen}
+              curso={cursoSeleccionada ?? undefined}
+              onClose={() => {
+                setModalOpen(false);
+                setCursoSeleccionada(null);
+              }}
+              onGuardadoExitoso={handleGuardadoExitoso}
+            />
     </DefaultLayout>
   )
 }
