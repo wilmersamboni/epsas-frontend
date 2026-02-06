@@ -15,7 +15,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { listar_sede } from "@/api/SedeApi";
-import {  actualizar_area } from "@/api/AreasApi";
+import {  actualizar_area, crear_area } from "@/api/AreasApi";
 
 /* =======================
    VALIDACIÓN
@@ -112,22 +112,28 @@ export default function AreaFormModal({
   /* =======================
      SUBMIT
   ======================= */
-  const onSubmit = async (data: AreaFormData) => {
-    try {
-      if (area?.id_area) {
-        const datosParaBackend = {
-            nombre: data.nombre,
-            fk_sede: data.sede, // Mapeamos 'sede' a 'fk_sede'
-        };
-        await actualizar_area(area.id_area, datosParaBackend);
-        onGuardadoExitoso();
-      } 
+ const onSubmit = async (data: AreaFormData) => {
+  try {
+    const datosParaBackend = {
+      nombre: data.nombre,
+      fk_sede: data.sede,
+    };
 
-      onClose();
-    } catch (e) {
-      console.error(e);
+    if (area?.id_area) {
+      // ✏️ ACTUALIZAR
+      await actualizar_area(area.id_area, datosParaBackend);
+    } else {
+      // ➕ CREAR
+      await crear_area(datosParaBackend);
     }
-  };
+
+    onGuardadoExitoso();
+    onClose();
+  } catch (e) {
+    console.error("Error al guardar área", e);
+  }
+};
+
 
   /* =======================
      RENDER
