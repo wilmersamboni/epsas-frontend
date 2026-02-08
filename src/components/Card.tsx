@@ -1,70 +1,77 @@
-import { Card, CardHeader, CardBody } from "@heroui/card";
+import { Card, CardBody } from "@heroui/card";
+import { Button } from "@heroui/button";
 import { useNavigate } from "react-router-dom";
 
-
 export function DashboardCards() {
-  const navigate = useNavigate();  
+  const navigate = useNavigate();
+
   const cards = [
     {
       title: "Seguimiento",
+      description: "Lleva el control de la etapa productiva de los aprendices SENA.",
       img: "/img/biotic.jpg",
-      path:"/seguimiento"
+      path: "/seguimiento",
     },
     {
       title: "Historial",
+      description: "Consulta a los aprendices certificados, en proceso y por certificar.",
       img: "/img/biotic.jpg",
-      path:"/docs"
+      path: "/docs",
     },
     {
       title: "Formatos",
+      description: "Accede y gestiona los formatos necesarios del proceso.",
       img: "/img/biotic.jpg",
-      path:"/format"
+      path: "/format",
     },
-    {
-      title: "MiChat",
-      img: "/img/biotic.jpg",
-      path:"/blog"
-    }
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12 w-full px-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12 w-full px-6">
       {cards.map((card, index) => (
         <Card
           key={index}
           isPressable
-          onPress={() => navigate(card.path)}         
+          onPress={() => navigate(card.path)}
           className="
-            transition-all duration-300 
-            hover:shadow-2xl 
-            hover:scale-[1.03] 
-            cursor-pointer
-            overflow-hidden
-            rounded-2xl
-            w-62
+            max-w-[330px]
+            w-full
             mx-auto
+            rounded-xl
+            overflow-hidden
+            shadow-sm
+            hover:shadow-lg
+            transition-all
+            duration-300
+            bg-white
           "
         >
-
-          {/* Imagen como fondo */}
-          <CardBody
-            className="
-              h-40 
-              bg-cover 
-              bg-center 
-              rounded-xl
-            "
-            style={{
-              backgroundImage: `url(${card.img})`,
-            }}
+          {/* Imagen */}
+          <img
+            src={card.img}
+            alt={card.title}
+            className="h-30 w-full object-cover"
           />
 
-          {/* Texto */}
-          <CardHeader className="flex flex-col items-start p-4">
-            <h3 className="text-lg font-semibold">{card.title}</h3>
-            {/* <p className="text-3xl font-bold">{card.value}</p> */}
-          </CardHeader>
+          {/* Contenido */}
+          <CardBody className="p-5 flex flex-col gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                {card.title}
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                {card.description}
+              </p>
+            </div>
 
+            <Button
+              color="primary"
+              className="mt-auto rounded-full"
+              onPress={() => navigate(card.path)}
+            >
+              Ingresar
+            </Button>
+          </CardBody>
         </Card>
       ))}
     </div>

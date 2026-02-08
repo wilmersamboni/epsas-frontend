@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 import CardMenu from "@/components/CardMenu";
 import AreaFormModal from "@/components/ModalMenu";
+import ButtomCreate from "@/components/BottomCreate";
 
 export default function AboutPage() {
   const [areas, setAreas] = useState<Area[]>([]);
@@ -67,11 +68,22 @@ const handleEliminar= async(area: Area)=>{
   return (
     <DefaultLayout>
       <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
+         <div className="fixed top-24 right-20 z-50">
+          <ButtomCreate
+          onClick={() => {
+    setAreaSeleccionada(null);
+    setModalOpen(true);
+  }}
+/>
+        </div>
+
+
         <div className="inline-block max-w-lg text-center justify-center">
           <h1 className={title()}>Seguimiento de Áreas</h1>
         </div>
-
+         
         <div className="flex flex-wrap justify-center gap-6 max-w-6xl">
+          
           {areas.map((area) => (
             <div key={area.id_area || area.nombre} className="mb-4">
               <Card 
