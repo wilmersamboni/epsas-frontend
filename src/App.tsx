@@ -5,6 +5,7 @@ import {IndexPage, DocsPage, PricingPage, BlogPage, AboutPage, PageCourse, Forgo
 
 import LoginPage from "@/pages/LoginPage";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import PageTable from "@/pages/PageTable";
 
 function App() {
   return (
@@ -61,6 +62,8 @@ function App() {
 
       <Route element={<ForgotPasswordPage />} path="/ForgotPassword" />
       <Route element={<SettingsPage />} path="/settings" />
+      <Route path="/pagetable/:idCurso" element={<PageTable />} />
+
     </Routes>
   );
 }

@@ -11,67 +11,22 @@ import {
 } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { listar_areas } from "@/api/AreasApi";
-import { actualizar_curso, listar_programas } from "@/api/CursosApi";
+import {
+  actualizar_curso,
+  crear_curso,
+  listar_programas,
+} from "@/api/CursosApi";
 import { listar_personas } from "@/api/PersonasApi";
 import Calendario from "./Calendar";
+import { CursoFormModalProps } from "@/types/ModalCurso";
+import { Area } from "@/types/areaCard";
+import { Programa } from "@/types/Programa";
+import { Lider } from "@/types/Lider";
+import { CursoFormData, cursoSchema } from "@/schemas/Curso";
 
-/* =======================
-   VALIDACIÓN
-======================= */
-const areaSchema = z.object({
-  codigo: z.number().min(1, "El código es obligatorio"),
-
-  area: z.number({ required_error: "Debe seleccionar un Área" }),
-  programa: z.number({ required_error: "Debe seleccionar un Programa" }),
-  persona: z.number({ required_error: "Debe seleccionar un Líder" }),
-
-  Fecha_inicio: z.string().min(1, "La fecha de inicio es obligatoria"),
-  Fecha_fin_lectiva: z.string().min(1, "La fecha fin lectiva es obligatoria"),
-  Fecha_fin_practica: z.string().min(1, "La fecha fin práctica es obligatoria"),
-});
-
-type CursoFormData = z.infer<typeof areaSchema>;
-
-/* =======================
-   TIPOS
-======================= */
-interface CursoFormModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  curso?: {
-    id_curso?: number;
-    codigo?: number;
-    fecha_inicio?: Date;
-    fecha_fin_lectiva?: Date;
-    fecha_ffin_practica?: Date;
-    area?: number;
-    programa?: number;
-    persona?: number;
-  };
-  onGuardadoExitoso: () => void;
-}
-
-interface Area {
-  id_area: number;
-  nombre: string;
-}
-interface Programa {
-  id_programa: number;
-  nombre: string;
-}
-interface Lider {
-  id_persona: number;
-  nombre: string;
-}
-
-/* =======================
-   COMPONENTE
-======================= */
-export default function AreaFormModal({
+export default function CursoFormModal({
   isOpen,
   onClose,
   curso,
@@ -87,20 +42,21 @@ export default function AreaFormModal({
     reset,
     formState: { errors, isSubmitting },
   } = useForm<CursoFormData>({
-    resolver: zodResolver(areaSchema),
-    defaultValues: {
-      codigo: 0,
-      area: 0,
-      programa: 0,
-      persona: 0,
-      Fecha_inicio: "",
-      Fecha_fin_lectiva: "",
-      Fecha_fin_practica: "",
-    },
-  });
+  resolver: zodResolver(cursoSchema),
+  defaultValues: {
+    codigo: undefined,
+    area: undefined,
+    programa: undefined,
+    persona: undefined,
+    Fecha_inicio: "",
+    Fecha_fin_lectiva: "",
+    Fecha_fin_practica: "",
+  },
+});
+
 
   /* =======================
-     CARGAR DATOS
+     CARGAR LISTAS
   ======================= */
   useEffect(() => {
     if (!isOpen) return;
@@ -111,45 +67,58 @@ export default function AreaFormModal({
   }, [isOpen]);
 
   /* =======================
-     RESET AL EDITAR
+     RESET ÚNICO (CREAR / EDITAR)
   ======================= */
   useEffect(() => {
-    if (isOpen && curso) {
+    if (!isOpen) return;
+
+    if (curso && areas.length && programas.length && personas.length) {
+      // EDITAR
+     reset({
+  codigo: curso.codigo,
+  area: curso.fk_area,
+  programa: curso.fk_programa,
+  persona: curso.lider,
+  Fecha_inicio: curso.fecha_inicio?.split("T")[0] ?? "",
+  Fecha_fin_lectiva: curso.fin_lectiva?.split("T")[0] ?? "",
+  Fecha_fin_practica: curso.fecha_fin?.split("T")[0] ?? "",
+});
+
+    } else {
+      // CREAR
       reset({
-        codigo: curso.codigo ?? 0,
-        area: curso.area ?? 0,
-        programa: curso.programa ?? 0,
-        persona: curso.persona ?? 0,
-        Fecha_inicio: curso.fecha_inicio
-          ? new Date(curso.fecha_inicio).toISOString().split("T")[0]
-          : "",
-        Fecha_fin_lectiva: curso.fecha_fin_lectiva
-          ? new Date(curso.fecha_fin_lectiva).toISOString().split("T")[0]
-          : "",
-        Fecha_fin_practica: curso.fecha_ffin_practica
-          ? new Date(curso.fecha_ffin_practica).toISOString().split("T")[0]
-          : "",
+        codigo: undefined,
+        area: undefined,
+        programa: undefined,
+        persona: undefined,
+        Fecha_inicio: "",
+        Fecha_fin_lectiva: "",
+        Fecha_fin_practica: "",
       });
     }
-  }, [curso, isOpen, reset]);
+  }, [isOpen, curso, areas, programas, personas, reset]);
 
   /* =======================
      SUBMIT
   ======================= */
   const onSubmit = async (data: CursoFormData) => {
-    if (!curso?.id_curso) return;
+    const payload = {
+  codigo: data.codigo,
+  fecha_inicio: data.Fecha_inicio,
+  fecha_fin: data.Fecha_fin_practica,
+  fin_lectiva: data.Fecha_fin_lectiva,
+  fk_area: data.area,
+  fk_programa: data.programa,
+  lider: data.persona,
+};
 
-    const datosParaBackend = {
-      codigo: data.codigo,
-      fecha_inicio: data.Fecha_inicio,
-      fecha_fin: data.Fecha_fin_practica,
-      fin_lectiva: data.Fecha_fin_lectiva,
-      fk_area: data.area,
-      fk_programa: data.programa,
-      lider: data.persona,
-    };
 
-    await actualizar_curso(curso.id_curso, datosParaBackend);
+    if (curso?.id_curso) {
+      await actualizar_curso(curso.id_curso, payload);
+    } else {
+      await crear_curso(payload);
+    }
+
     onGuardadoExitoso();
     onClose();
   };
@@ -188,12 +157,7 @@ export default function AreaFormModal({
                 name="Fecha_inicio"
                 control={control}
                 render={({ field }) => (
-                  <Calendario
-                    {...field}
-                    label="Fecha inicio del curso"
-                    isInvalid={!!errors.Fecha_inicio}
-                    errorMessage={errors.Fecha_inicio?.message}
-                  />
+                  <Calendario {...field} label="Fecha inicio" />
                 )}
               />
 
@@ -201,12 +165,7 @@ export default function AreaFormModal({
                 name="Fecha_fin_lectiva"
                 control={control}
                 render={({ field }) => (
-                  <Calendario
-                    {...field}
-                    label="Fecha fin lectiva"
-                    isInvalid={!!errors.Fecha_fin_lectiva}
-                    errorMessage={errors.Fecha_fin_lectiva?.message}
-                  />
+                  <Calendario {...field} label="Fecha fin lectiva" />
                 )}
               />
 
@@ -214,27 +173,24 @@ export default function AreaFormModal({
                 name="Fecha_fin_practica"
                 control={control}
                 render={({ field }) => (
-                  <Calendario
-                    {...field}
-                    label="Fecha fin práctica"
-                    isInvalid={!!errors.Fecha_fin_practica}
-                    errorMessage={errors.Fecha_fin_practica?.message}
-                  />
+                  <Calendario {...field} label="Fecha fin práctica" />
                 )}
               />
 
+              {/* ÁREA */}
               <Controller
                 name="area"
                 control={control}
                 render={({ field }) => (
                   <Select
                     label="Área"
-                    selectedKeys={[String(field.value)]}
-                    onSelectionChange={(keys) =>
-                      field.onChange(Number([...keys][0]))
+                    selectedKeys={
+                      field.value ? [String(field.value)] : []
                     }
-                    isInvalid={!!errors.area}
-                    errorMessage={errors.area?.message}
+                    onSelectionChange={(keys) => {
+                      const v = [...keys][0];
+                      field.onChange(v ? Number(v) : undefined);
+                    }}
                   >
                     {areas.map((a) => (
                       <SelectItem key={a.id_area}>
@@ -245,18 +201,20 @@ export default function AreaFormModal({
                 )}
               />
 
+              {/* PROGRAMA */}
               <Controller
                 name="programa"
                 control={control}
                 render={({ field }) => (
                   <Select
                     label="Programa"
-                    selectedKeys={[String(field.value)]}
-                    onSelectionChange={(keys) =>
-                      field.onChange(Number([...keys][0]))
+                    selectedKeys={
+                      field.value ? [String(field.value)] : []
                     }
-                    isInvalid={!!errors.programa}
-                    errorMessage={errors.programa?.message}
+                    onSelectionChange={(keys) => {
+                      const v = [...keys][0];
+                      field.onChange(v ? Number(v) : undefined);
+                    }}
                   >
                     {programas.map((p) => (
                       <SelectItem key={p.id_programa}>
@@ -267,18 +225,20 @@ export default function AreaFormModal({
                 )}
               />
 
+              {/* LÍDER */}
               <Controller
                 name="persona"
                 control={control}
                 render={({ field }) => (
                   <Select
                     label="Líder"
-                    selectedKeys={[String(field.value)]}
-                    onSelectionChange={(keys) =>
-                      field.onChange(Number([...keys][0]))
+                    selectedKeys={
+                      field.value ? [String(field.value)] : []
                     }
-                    isInvalid={!!errors.persona}
-                    errorMessage={errors.persona?.message}
+                    onSelectionChange={(keys) => {
+                      const v = [...keys][0];
+                      field.onChange(v ? Number(v) : undefined);
+                    }}
                   >
                     {personas.map((p) => (
                       <SelectItem key={p.id_persona}>

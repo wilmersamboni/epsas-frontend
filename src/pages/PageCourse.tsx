@@ -8,6 +8,7 @@ import { useParams } from 'react-router-dom';
 import CardMenu from "@/components/CardMenu";
 import { useNavigate } from 'react-router-dom';
 import CursoFormModal from "@/components/ModalMenuCurso";
+import ButtomCreate from "@/components/BottomCreate";
 
 function PageCourse() {
   const { idArea } = useParams<{ idArea: string }>();
@@ -17,33 +18,34 @@ function PageCourse() {
         const [cursoSeleccionada, setCursoSeleccionada] = useState<CursoInfo | null>(null);
         const navigate = useNavigate();
     
-      
-        // 💡 2. Validar que el ID exista y sea un número válido
-        if (!idArea) {
-            setError("ID de Área no especificado en la URL.");
-            return;
-        }
+ const areaIdNumber = idArea ? Number(idArea) : null;
+     
+       useEffect(() => {
+  if (!areaIdNumber) {
+    setError("ID de Área no válido.");
+    return;
+  }
+  setError(null);
+}, [areaIdNumber]);
 
-        const areaIdNumber = Number(idArea);
-        if (isNaN(areaIdNumber) || areaIdNumber <= 0) {
-            setError("ID de Área no válido.");
-            return;
-        }
+
         
         async function cargarCursos() {
-          try {
-            
-            const data = await listar_cursos_area(areaIdNumber); 
-            setCursos(data);
-            setError(null);
-          } catch (e) {
-            console.error("fallo al obtener los cursos: ", e);
-            setError("Error al cargar los Cursos. Por favor, intente más tarde");
-          }
-        }
+  if (!areaIdNumber) return;
+
+  try {
+    const data = await listar_cursos_area(areaIdNumber);
+    setCursos(data);
+    setError(null);
+  } catch (e) {
+    console.error("fallo al obtener los cursos: ", e);
+    setError("Error al cargar los Cursos. Por favor, intente más tarde");
+  }
+}
+
 useEffect(()=>{
         cargarCursos();
-      }, []);
+      }, [areaIdNumber]);
 
         const handleGuardadoExitoso = () => {
         // Cierra el modal, limpia la selección y recarga los datos
@@ -83,6 +85,14 @@ useEffect(()=>{
   return (
     <DefaultLayout>
         <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
+          <div className="fixed top-24 right-20 z-50">
+                    <ButtomCreate
+                    onClick={() => {
+              setCursoSeleccionada(null);
+              setModalOpen(true);
+            }}
+          />
+        </div>
         <div className="inline-block max-w-lg text-center justify-center">
           <h1 className={title()}>Seguimiento de Cursos</h1>
         </div>
@@ -94,7 +104,8 @@ useEffect(()=>{
             <div key={curso.id_curso || curso.codigo} className="mb-4">
               <Card 
                 isPressable
-                onPress={() => navigate(`/area-detail/${curso.id_curso}`)}
+                onPress={() => navigate(`/pagetable/${curso.id_curso}`)}
+
                 className="
                   group
                   w-72 h-44 p-6
@@ -209,14 +220,16 @@ useEffect(()=>{
       </section>
 
       <CursoFormModal
-              isOpen={modalOpen}
-              curso={cursoSeleccionada ?? undefined}
-              onClose={() => {
-                setModalOpen(false);
-                setCursoSeleccionada(null);
-              }}
-              onGuardadoExitoso={handleGuardadoExitoso}
-            />
+  key={cursoSeleccionada?.id_curso ?? "nuevo"}
+  isOpen={modalOpen}
+  curso={cursoSeleccionada ?? undefined}
+  onClose={() => {
+    setModalOpen(false);
+    setCursoSeleccionada(null);
+  }}
+  onGuardadoExitoso={handleGuardadoExitoso}
+/>
+
     </DefaultLayout>
   )
 }
