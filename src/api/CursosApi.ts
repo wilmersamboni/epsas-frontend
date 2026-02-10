@@ -15,6 +15,11 @@ export const eliminar_curso= async(id_curso:Number)=>{
     return responde.data
 }
 
+export  const crear_curso = async(datos)=>{
+    const responde= await conexionDb.post(`curso/registrar_jwsv`, datos)
+    return responde.data
+}
+
 export const listar_programas = async(datos)=>{
     const responde = await conexionDb.get('programa/listar_jwsv',datos)
     return responde.data
