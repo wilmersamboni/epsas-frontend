@@ -7,9 +7,15 @@ import {
   ModalFooter,
   Button,
   Spinner,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Textarea
 } from "@heroui/react";
 import { obtenerSeguimientos } from "@/api/Seguimiento";
 import { Card, CardHeader, CardBody, Chip } from "@heroui/react";
+import BitacorasModal from "./ModalBitacoras";
 
 interface Props {
   isOpen: boolean;
@@ -22,8 +28,10 @@ export default function SeguimientosModal({ isOpen, onClose, alumno }: Props) {
   const [loading, setLoading] = useState(false);
   const [selectedSeguimiento, setSelectedSeguimiento] =
     React.useState<any>(null);
-  const [isSeguimientosOpen, setIsSeguimientosOpen] = useState(false);
   const [isDetalleOpen, setIsDetalleOpen] = useState(false);
+
+  const [isEditOpen, setIsEditOpen] = useState(false);
+const [seguimientoEditando, setSeguimientoEditando] = useState<any>(null);
 
   useEffect(() => {
     const cargarSeguimientos = async () => {
@@ -35,7 +43,6 @@ export default function SeguimientosModal({ isOpen, onClose, alumno }: Props) {
         const data = await obtenerSeguimientos(alumno.id);
         setSeguimientos(data);
 
-        setSeguimientos(data);
       } catch (error) {
         console.error("Error cargando seguimientos", error);
       } finally {
@@ -47,6 +54,8 @@ export default function SeguimientosModal({ isOpen, onClose, alumno }: Props) {
       cargarSeguimientos();
     }
   }, [isOpen, alumno]);
+
+  
   const formatearFecha = (fecha: string) => {
     if (!fecha) return "Sin fecha";
 
@@ -57,15 +66,28 @@ export default function SeguimientosModal({ isOpen, onClose, alumno }: Props) {
       : date.toLocaleDateString("es-ES");
   };
 
-  const abrirDetalle = (item: any) => {
-    setSelectedSeguimiento(item);
+const abrirDetalle = (item: any) => {
+  setSelectedSeguimiento(item);
+  setIsDetalleOpen(true);
+};
 
-    onClose(); // 👈 cierra el modal actual
+const guardarCambios = async () => {
+  try {
+    await actualizarSeguimiento(seguimientoEditando.id, seguimientoEditando);
+    setIsEditOpen(false);
 
-    setTimeout(() => {
-      setIsDetalleOpen(true); // 👈 abre el nuevo
-    }, 200);
-  };
+    // refrescar lista
+    const data = await obtenerSeguimientos(alumno.id);
+    setSeguimientos(data);
+
+  } catch (error) {
+    console.error("Error actualizando", error);
+  }
+};
+const abrirEditar = (item: any) => {
+  setSeguimientoEditando(item);
+  setIsEditOpen(true);
+};
 
   return (
     <>
@@ -82,39 +104,78 @@ export default function SeguimientosModal({ isOpen, onClose, alumno }: Props) {
               <div className="flex flex-col gap-4">
                 {seguimientos.map((item) => (
                   <Card
-                    key={item.id}
-                    shadow="sm"
-                    isPressable
-                    onPress={() => abrirDetalle(item)}
-                    className="w-full"
-                  >
-                    <CardHeader className="flex justify-between items-center">
-                      <span className="font-semibold">
-                        {formatearFecha(item.fecha)}
-                      </span>
+  key={item.id}
+  shadow="sm"
+  isPressable
+  onPress={() => abrirDetalle(item)}
+  className="w-full"
+>
+  <CardHeader className="flex justify-between items-center">
 
-                      <Chip
-                        color={
-                          item.estado === "Activo"
-                            ? "success"
-                            : item.estado === "Pendiente"
-                              ? "warning"
-                              : "danger"
-                        }
-                        variant="flat"
-                        size="sm"
-                      >
-                        {item.estado}
-                      </Chip>
-                    </CardHeader>
+    <span className="font-semibold">
+      Seguimientos
+    </span>
 
-                    <CardBody>
-                      <p>Observación:</p>
-                      <p className="text-sm text-default-600">
-                        {item.observacion}
-                      </p>
-                    </CardBody>
-                  </Card>
+    <div className="flex items-center gap-2">
+
+      <Chip
+        color={
+          item.estado === "activo"
+            ? "success"
+            : item.estado === "pendiente"
+            ? "warning"
+            : "danger"
+        }
+        variant="flat"
+        size="sm"
+      >
+        {item.estado}
+      </Chip>
+
+      <Dropdown>
+  <DropdownTrigger>
+    <Button
+      isIconOnly
+      size="sm"
+      variant="light"
+      onPress={(e) => {
+        e.stopPropagation(); // 🔥 evita que la card se dispare
+      }}
+    >
+      ⋮
+    </Button>
+  </DropdownTrigger>
+
+  <DropdownMenu
+  aria-label="Opciones"
+  onAction={(key) => {
+    if (key === "ver") abrirDetalle(item);
+    if (key === "editar") abrirEditar(item);
+  }}
+>
+  {/* <DropdownItem key="ver">Ver detalle</DropdownItem> */}
+  <DropdownItem key="editar">Observacion</DropdownItem>
+  <DropdownItem
+    key="eliminar"
+    className="text-danger"
+    color="danger"
+  >
+    Eliminar
+  </DropdownItem>
+</DropdownMenu>
+</Dropdown>
+
+    </div>
+
+  </CardHeader>
+
+  <CardBody>
+    <label htmlFor="">Observacion:</label>
+    <p className="text-sm text-default-600">
+      {item.observacion}
+    </p>
+  </CardBody>
+</Card>
                 ))}
               </div>
             )}
@@ -129,43 +190,57 @@ export default function SeguimientosModal({ isOpen, onClose, alumno }: Props) {
       </Modal>
 
       {/* Modal detalle */}
-      <Modal
-        isOpen={isDetalleOpen}
-        onClose={() => setIsDetalleOpen(false)}
-        size="md"
+      {selectedSeguimiento && (
+  <BitacorasModal
+    isOpen={isDetalleOpen}
+    onClose={() => setIsDetalleOpen(false)}
+    alumno={alumno}
+    seguimiento={selectedSeguimiento}
+  />
+)}
+<Modal
+  isOpen={isEditOpen}
+  onClose={() => setIsEditOpen(false)}
+  size="md"
+>
+  <ModalContent>
+    <ModalHeader>Editar Seguimiento</ModalHeader>
+
+    <ModalBody>
+      {seguimientoEditando && (
+        <div className="flex flex-col gap-4">
+
+          <Textarea
+  label="Observación"
+  value={seguimientoEditando?.observacion || ""}
+  onChange={(e) =>
+    setSeguimientoEditando({
+      ...seguimientoEditando,
+      observacion: e.target.value,
+    })
+  }
+/>
+        </div>
+      )}
+    </ModalBody>
+
+    <ModalFooter>
+      <Button
+        variant="light"
+        onPress={() => setIsEditOpen(false)}
       >
-        <ModalContent>
-          <ModalHeader>Detalle del Seguimiento</ModalHeader>
+        Cancelar
+      </Button>
 
-          <ModalBody>
-            {selectedSeguimiento && (
-              <>
-                <p>
-                  <strong>Fecha:</strong>{" "}
-                  {formatearFecha(selectedSeguimiento.fecha)}
-                </p>
-                <p>
-                  <strong>Estado:</strong> {selectedSeguimiento.estado}
-                </p>
-                <p>
-                  <strong>Observación:</strong>
-                </p>
-                <p>{selectedSeguimiento.observacion}</p>
-              </>
-            )}
-          </ModalBody>
-
-          <ModalFooter>
-            <Button
-              color="danger"
-              variant="light"
-              onPress={() => setIsDetalleOpen(false)}
-            >
-              Cerrar
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <Button
+        color="primary"
+        onPress={guardarCambios}
+      >
+        Guardar
+      </Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
     </>
   );
 }
