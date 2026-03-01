@@ -11,48 +11,13 @@ import {
 } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-
+import { AreaFormModalProps } from "@/types/ModalMenu";
 import { listar_sede } from "@/api/SedeApi";
 import {  actualizar_area, crear_area } from "@/api/AreasApi";
+import { Sede } from "@/types/sede";
+import { AreaFormData, areaSchema } from "@/schemas/area";
 
-/* =======================
-   VALIDACIÓN
-======================= */
-
-const areaSchema = z.object({
-  nombre: z.string().min(1, "El nombre es obligatorio"),
-  sede: z.number({
-    required_error: "Debe seleccionar una sede",
-  }),
-});
-
-type AreaFormData = z.infer<typeof areaSchema>;
-
-/* =======================
-   TIPOS
-======================= */
-
-interface AreaFormModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  area?: {
-    id_area?: number;
-    nombre?: string;
-    sede?: number;
-  };
-  onGuardadoExitoso: () => void;
-}
-
-interface Sede {
-  id_sede: number;
-  nombre: string;
-}
-
-/* =======================
-   COMPONENTE
-======================= */
 
 export default function AreaFormModal({
   isOpen,

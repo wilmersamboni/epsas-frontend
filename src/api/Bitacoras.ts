@@ -6,3 +6,8 @@ export const obtenerBitacoras = async (idSeguimiento: number) => {
   );
   return response.data;
 };
+
+export const actualizarEstadoBitacora= async(id_bitacora: number, estado: string)=>{
+  const responde = await conexionDb1.put(`bitacora/estado/${id_bitacora} `, {estado})
+  return responde.data
+}

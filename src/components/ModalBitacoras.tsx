@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import{ useEffect, useState } from "react";
 import {
   Modal,
   ModalContent,
@@ -11,27 +11,21 @@ import {
 import { obtenerBitacoras } from "@/api/Bitacoras";
 import BitacorasCard from "./BitacorasCard";
 import BitacoraDetalleModal from "./BitacoraDetalleModal";
+import { PropsBitacora } from "@/types/ModalBitacora";
 
-interface Props {
-  isOpen: boolean;
-  onClose: () => void;
-  alumno: any;
-  seguimiento: any;
-}
 
 export default function BitacorasModal({
   isOpen,
   onClose,
   alumno,
   seguimiento,
-}: Props) {
+}: PropsBitacora) {
   const [bitacoras, setBitacoras] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedBitacora, setSelectedBitacora] = useState<any>(null);
   const [isDetalleOpen, setIsDetalleOpen] = useState(false);
 
-  useEffect(() => {
-  if (!isOpen) return;
+  const cargarBitacoras = async () => {
   if (!seguimiento) return;
 
   const seguimientoId =
@@ -39,20 +33,21 @@ export default function BitacorasModal({
 
   if (!seguimientoId) return;
 
-  const cargarBitacoras = async () => {
-    setLoading(true);
-    try {
-      const data = await obtenerBitacoras(seguimientoId);
-      console.log("DATA FRONTEND:", data);
-      setBitacoras(data);
-    } catch (error) {
-      console.error("Error cargando bitácoras", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  try {
+    const data = await obtenerBitacoras(seguimientoId);
+    setBitacoras(data);
+  } catch (error) {
+    console.error("Error cargando bitácoras", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
-  cargarBitacoras();
+useEffect(() => {
+  if (isOpen) {
+    cargarBitacoras();
+  }
 }, [isOpen, seguimiento]);
 
   const abrirDetalle = (item: any) => {
@@ -76,11 +71,12 @@ console.log("Render bitacoras:", bitacoras);
             ) : (
               <div className="flex flex-col gap-4">
                 {bitacoras.map((item) => (
-  <BitacorasCard
-    key={item.id_bitacora}
-    item={item}
-    onClick={abrirDetalle}
-  />
+ <BitacorasCard
+  key={item.id_bitacora}
+  item={item}
+  onClick={abrirDetalle}
+  recargarBitacoras={cargarBitacoras}
+/>
 ))}
               </div>
             )}
