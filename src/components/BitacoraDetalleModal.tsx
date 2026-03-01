@@ -6,18 +6,14 @@ import {
   ModalFooter,
   Button,
 } from "@heroui/react";
+import { DetalleBitacora } from "@/types/BitacoraDetalle";
 
-interface Props {
-  isOpen: boolean;
-  onClose: () => void;
-  bitacora: any;
-}
 
 export default function BitacoraDetalleModal({
   isOpen,
   onClose,
   bitacora,
-}: Props) {
+}: DetalleBitacora) {
   const formatearFecha = (fecha: string) => {
     if (!fecha) return "Sin fecha";
     const date = new Date(fecha);
