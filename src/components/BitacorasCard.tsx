@@ -1,12 +1,9 @@
 import React from "react";
-import { Card, CardHeader, CardBody, Chip } from "@heroui/react";
+import { Card, CardHeader, CardBody, Chip, Button, Dropdown, DropdownTrigger, DropdownItem, DropdownMenu } from "@heroui/react";
+import { actualizarEstadoBitacora } from "@/api/Bitacoras";
+import { Props } from "@/types/BitacorasCard";
 
-interface Props {
-  item: any;
-  onClick: (item: any) => void;
-}
-
-export default function BitacorasCard({ item, onClick }: Props) {
+export default function BitacorasCard({ item, onClick, recargarBitacoras }: Props) {
   const formatearFecha = (fecha: string) => {
     if (!fecha) return "Sin fecha";
     const date = new Date(fecha);
@@ -46,6 +43,64 @@ export default function BitacorasCard({ item, onClick }: Props) {
         <p className="text-sm text-default-600">
           {item.bitacora_pdf}
         </p>
+       <Dropdown>
+  <DropdownTrigger>
+    <Button 
+      size="sm" 
+      variant="flat" 
+      color="primary"
+      className="font-medium mt-5"
+    >
+      Evaluar Bitacora
+    </Button>
+  </DropdownTrigger>
+
+  <DropdownMenu
+    aria-label="Cambiar estado de bitácora"
+    disallowEmptySelection
+    selectionMode="single"
+    selectedKeys={[item.estado]}
+    onAction={async (key) => {
+      try {
+        const nuevoEstado = String(key);
+
+        await actualizarEstadoBitacora(
+          item.id_bitacora,
+          nuevoEstado
+        );
+
+        recargarBitacoras();
+
+      } catch (error) {
+        console.error("Error actualizando estado:", error);
+      }
+    }}
+  >
+    <DropdownItem 
+      key="pendiente"
+      color="warning"
+      className="text-warning font-medium"
+    >
+      🕒 Pendiente
+    </DropdownItem>
+
+    <DropdownItem 
+      key="aceptada"
+      color="success"
+      className="text-success font-medium"
+    >
+      ✅ Aceptar
+    </DropdownItem>
+
+    <DropdownItem 
+      key="rechazada"
+      color="danger"
+      className="text-danger font-medium"
+    >
+      ❌ Rechazar
+    </DropdownItem>
+  </DropdownMenu>
+</Dropdown>
       </CardBody>
     </Card>
   );
