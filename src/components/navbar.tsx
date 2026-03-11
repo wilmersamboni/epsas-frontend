@@ -1,4 +1,3 @@
-import { Kbd } from "@heroui/kbd";
 import { Link } from "@heroui/link";
 import { Input } from "@heroui/input";
 import {
@@ -11,9 +10,8 @@ import {
   NavbarMenuItem,
 } from "@heroui/navbar";
 import { siteConfig } from "@/config/site";
-import { ThemeSwitch } from "@/components/theme-switch";
 import { SearchCheckIcon } from "lucide-react";
-import { Logo, TwitterIcon } from "@/components/icons";
+import { TwitterIcon } from "@/components/icons";
 
 export const Navbar = () => {
   const searchInput = (
@@ -23,11 +21,7 @@ export const Navbar = () => {
         inputWrapper: "bg-white/10 border border-white/20",
         input: "text-sm text-white placeholder:text-white/50",
       }}
-      endContent={
-        <Kbd className="hidden lg:inline-block text-white/60" keys={["command"]}>
-          K
-        </Kbd>
-      }
+    
       labelPlacement="outside"
       placeholder="Search..."
       startContent={
@@ -51,7 +45,10 @@ export const Navbar = () => {
             color="foreground"
             href="/"
           >
-            <Logo />
+            <img
+              src="public/img/logo.png"
+              className="h-10 w-auto object-contain"
+            />
             <p className="font-bold text-white">EPSAS</p>
           </Link>
         </NavbarBrand>
@@ -62,9 +59,6 @@ export const Navbar = () => {
         className="hidden sm:flex basis-1/5 sm:basis-full"
         justify="end"
       >
-        <NavbarItem className="hidden sm:flex gap-2">
-          <ThemeSwitch />
-        </NavbarItem>
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
       </NavbarContent>
 
@@ -73,7 +67,6 @@ export const Navbar = () => {
         <Link isExternal href={siteConfig.links.github}>
           <TwitterIcon className="text-white" />
         </Link>
-        <ThemeSwitch />
         <NavbarMenuToggle className="text-white" />
       </NavbarContent>
 
