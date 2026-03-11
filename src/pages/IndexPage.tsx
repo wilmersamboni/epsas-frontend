@@ -1,21 +1,19 @@
-import  {title, subtitle, GithubIcon, DashboardCards } from "@/components";
+import { title, DashboardCards } from "@/components";
 import DefaultLayout from "@/layouts/default";
 
 export default function IndexPage() {
   return (
     <DefaultLayout>
-      <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
+      <div className="flex flex-col items-center gap-6 py-10 px-6 w-full">
         
-        <div className="inline-block max-w-lg text-center justify-center">
+        <div className="text-center">
           <span className={title()}>Bienvenido a &nbsp;</span>
-          <span className={title({ color: "violet" })}>Epsas&nbsp;</span>
-          <br />
+          <span className={title({ color: "violet" })}>Epsas</span>
         </div>
 
-        {/* Aquí insertas el Dashboard */}
         <DashboardCards />
 
-      </section>
+      </div>
     </DefaultLayout>
   );
 }

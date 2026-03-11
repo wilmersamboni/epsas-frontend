@@ -1,10 +1,10 @@
 import { Popover, PopoverTrigger, PopoverContent } from "@heroui/popover";
 import { Avatar } from "@heroui/avatar";
-import { User, Settings, LogOut } from "lucide-react";
-import { useNavigate } from "react-router-dom"; // 👈 Importar
+import { User, Settings } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-export default function PerfilPopover() {
-  const navigate = useNavigate(); // 👈 Hook de navegación
+export default function PerfilPopover({ open }: { open: boolean }) {
+  const navigate = useNavigate();
 
   return (
     <Popover placement="right-start">
@@ -13,25 +13,20 @@ export default function PerfilPopover() {
           <Avatar
             name="Daniela"
             size="sm"
-            className="bg-blue-600 text-white"
+            className="bg-blue-600 text-white flex-shrink-0"
           />
-          <span className="text-sm font-semibold hidden lg:block">Daniela</span>
+          {/* Solo muestra el nombre si el sidebar está abierto */}
+          {open && (
+            <span className="text-sm font-semibold whitespace-nowrap overflow-hidden">
+              Daniela
+            </span>
+          )}
         </button>
       </PopoverTrigger>
 
-      <PopoverContent
-        className="
-          p-4 w-64 rounded-2xl backdrop-blur-xl 
-          bg-blue-900/40 border border-white/10 shadow-xl
-          text-white
-        "
-      >
+      <PopoverContent className="p-4 w-64 rounded-2xl backdrop-blur-xl bg-blue-900/40 border border-white/10 shadow-xl text-white">
         <div className="flex items-center gap-3 border-b border-white/20 pb-3">
-          <Avatar
-            name="Daniela"
-            className="bg-blue-600 text-white"
-            size="md"
-          />
+          <Avatar name="Daniela" className="bg-blue-600 text-white" size="md" />
           <div>
             <p className="text-sm font-bold">Daniela Sanchez</p>
             <p className="text-xs opacity-70">daniela@example.com</p>
@@ -39,15 +34,14 @@ export default function PerfilPopover() {
         </div>
 
         <div className="mt-3 flex flex-col gap-2">
-          <button 
-            onClick={() => navigate('/profile')} // 👈 Navegar a perfil
+          <button
+            onClick={() => navigate('/profile')}
             className="flex items-center gap-2 p-2 hover:bg-white/10 rounded-lg transition"
           >
             <User size={18} /> Mi perfil
           </button>
-
-          <button 
-            onClick={() => navigate('/settings')} // 👈 Navegar a configuración
+          <button
+            onClick={() => navigate('/settings')}
             className="flex items-center gap-2 p-2 hover:bg-white/10 rounded-lg transition"
           >
             <Settings size={18} /> Configuración
