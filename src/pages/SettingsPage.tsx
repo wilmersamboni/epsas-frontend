@@ -115,14 +115,14 @@ export default function SettingsPage() {
       </div>
 
       {/* Contenido principal */}
-      <div className="flex flex-col flex-1 min-h-screen">
+      <div className="flex flex-col flex-1 min-h-screen  overflow-y-auto">
         {/* Navbar */}
-        <div className="flex items-center px-4 h-16 border-b bg-white">
+        <div className="flex items-center px-0 h-16 border-b bg-white">
           <Navbar />
         </div>
 
         {/* Contenido de configuración */}
-        <main className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+        <main className="flex-1 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
           <div className="h-full p-4">
           <div className="max-w-6xl mx-auto h-full flex flex-col">
             
@@ -135,7 +135,7 @@ export default function SettingsPage() {
               
               {/* sidebar de configuracion*/}
               <div className="md:col-span-1 overflow-y-auto">
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-3 border border-white/20 h-full sticky top-0">
+                <div className="bg-white/10 backdrop-blur-lg rounded-xl md:rounded-2xl p-2 sm:p-3 md:p-4 border border-white/20 h-auto md:h-full sticky md:top-0">
                   {tabs.map((tab) => {
                     const Icon = tab.icon;
                     return (
@@ -157,8 +157,8 @@ export default function SettingsPage() {
               </div>
 
               {/* contenido principal, lado izquierdo */}
-              <div className="md:col-span-3 overflow-y-auto">
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 h-full">
+              <div className="md:col-span-3">
+                <div className="bg-white/10 backdrop-blur-lg rounded-xl md:rounded-2xl p-4 sm:p-5 md:p-6 border border-white/20 h-auto md:h-full">
                   
                   {/* perfil del sidebar de configuracion */}
                   {activeTab === 'perfil' && (
