@@ -1,10 +1,7 @@
 import { useState } from "react";
-import { Link } from "@heroui/link";
 import { Navbar } from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
-// import { Menu } from "lucide-react";
 import { Footer } from "@/components/Footer";
-
 
 export default function DefaultLayout({
   children,
@@ -16,7 +13,7 @@ export default function DefaultLayout({
   return (
     <div className="flex h-screen">
       
-      {/* sidebar */}
+      {/* SIDEBAR */}
       <div
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
@@ -25,28 +22,18 @@ export default function DefaultLayout({
         <Sidebar open={open} />
       </div>
 
-      <div className="flex flex-col flex-1 min-h-screen"
-        style={{ marginLeft: open ? 0 : 0 }}
-      >
+      {/* CONTENIDO DERECHO */}
+      <div className="flex flex-col flex-1 min-h-screen overflow-hidden bg-gray-50">
 
         {/* NAVBAR */}
-        <div className="flex items-center px-4 h-16 border-b bg-white">
-          <Navbar />
-        </div>
+        <Navbar />
 
-        
         {/* CONTENIDO */}
-        <main className="p-6 flex-1">{children}</main>
-
-
+        <main className="p-6 flex-1 overflow-y-auto">{children}</main>
 
         {/* FOOTER */}
-          <Footer className="rounded-r-xl" />
+        <Footer />
       </div>
     </div>
   );
 }
-
-
-
-
