@@ -100,7 +100,8 @@ export default function SettingsPage() {
   };
 
   const tabs = [
-    { id: 'perfil', label: 'Perfil', icon: User }
+    { id: 'perfil', label: 'Perfil', icon: User },
+    {id: 'aprendiz', label: 'Aprendiz', icon: User}
   ];
 
   return (
@@ -248,8 +249,9 @@ export default function SettingsPage() {
 
                       </div>
                     </div>
+                  
                   )}
-
+                  {/* aqui */}
                 </div>
               </div>
             </div>
@@ -258,7 +260,7 @@ export default function SettingsPage() {
         </main>
 
         {/* Footer */}
-        <Footer className="rounded-r-xl" />
+        <Footer/>
       </div>
     </div>
   );
