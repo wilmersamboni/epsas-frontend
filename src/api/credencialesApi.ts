@@ -8,11 +8,14 @@ const axiosClient = axios.create({
 export type Usuario = {
   nombre?: string;
   cargo?: string;
+  correo?:string;
 };
 
 export type LoginResponse = {
-  
+  token: string;
   usuario: Usuario;
+  accion: string;
+  mensaje: string;
 };
 
 export const validarCredencial = async (data: {

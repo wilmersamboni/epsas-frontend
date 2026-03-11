@@ -4,12 +4,14 @@ import { validarCredencial } from "@/api/credencialesApi";
 type Usuario = {
   nombre?: string;
   cargo?: string;
+  correo?:string;
 };
 
 type AuthContextType = {
   user: Usuario | null;
   login: (data: { login: string; password: string }) => Promise<void>;
   logout: () => void;
+  actualizarUser: (datos: Partial<Usuario>) => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -25,7 +27,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // ✅ SOLO guardas datos públicos
     localStorage.setItem("user", JSON.stringify(resp.usuario));
+    localStorage.setItem("token", resp.token);
     setUser(resp.usuario);
+  };
+
+  const actualizarUser = (datos: Partial<Usuario>) => {
+    setUser(prev => {
+      const nuevo = { ...prev, ...datos };
+      localStorage.setItem("user", JSON.stringify(nuevo));
+      return nuevo;
+    });
   };
 
   const logout = async () => {
@@ -35,7 +46,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, actualizarUser }}>
       {children}
     </AuthContext.Provider>
   );

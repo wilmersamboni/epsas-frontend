@@ -16,7 +16,7 @@ function RegistrarDepartamento({onSucess}:props) {
     register, 
     handleSubmit, 
     formState:{errors, isSubmitting},
-     reset,
+    reset,
     }=useForm<formDepartamento>({resolver: zodResolver(departamentoSchema),});
 
     const registroMutation= useMutation({
