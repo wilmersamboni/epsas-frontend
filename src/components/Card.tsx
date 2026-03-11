@@ -27,46 +27,27 @@ export function DashboardCards() {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12 w-full px-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
       {cards.map((card, index) => (
         <Card
           key={index}
           isPressable
           onPress={() => navigate(card.path)}
-          className="
-            max-w-[330px]
-            w-full
-            mx-auto
-            rounded-xl
-            overflow-hidden
-            shadow-sm
-            hover:shadow-lg
-            transition-all
-            duration-300
-            bg-white
-          "
+          className="w-full rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 bg-white"
         >
-          {/* Imagen */}
           <img
             src={card.img}
             alt={card.title}
-            className="h-30 w-full object-cover"
+            className="h-44 w-full object-cover"
           />
-
-          {/* Contenido */}
           <CardBody className="p-5 flex flex-col gap-4">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">
-                {card.title}
-              </h3>
-              <p className="text-sm text-gray-600 mt-1">
-                {card.description}
-              </p>
+              <h3 className="text-lg font-semibold text-gray-900">{card.title}</h3>
+              <p className="text-sm text-gray-600 mt-1">{card.description}</p>
             </div>
-
             <Button
               color="primary"
-              className="mt-auto rounded-full"
+              className="mt-auto rounded-full w-full"
               onPress={() => navigate(card.path)}
             >
               Ingresar
