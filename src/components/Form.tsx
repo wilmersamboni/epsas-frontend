@@ -40,13 +40,13 @@ export default function Form() {
   };
 
   return (
-            <div className="min-h-screen bg-gradient-to-br from-[#00304D] via-[#007832] to-[#00304D] flex items-center justify-center p-4 relative overflow-hidden">
-
-            {/* BLOBS */}
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute top-20 left-10 w-72 h-72 bg-[#39A900] rounded-full blur-3xl opacity-10 animate-pulse"></div>
-              <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#007832] rounded-full blur-3xl opacity-10 animate-pulse delay-700"></div>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
+      
+      {/* BLOBS */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500 rounded-full blur-3xl opacity-10 animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500 rounded-full blur-3xl opacity-10 animate-pulse delay-700"></div>
+      </div>
 
             <div className="w-full max-w-6xl mx-auto grid md:grid-cols-2 relative z-10">
 
@@ -82,22 +82,22 @@ export default function Form() {
                     </div>
                   )}
 
-                  {/* USUARIO */}
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium text-[#000000] mb-2">
-                      Usuario
-                    </label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                      <input
-                        type="text"
-                        value={loginValue}
-                        onChange={(e) => setLoginValue(e.target.value)}
-                        placeholder="usuario1"
-                        className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#39A900] focus:border-[#39A900] outline-none transition"
-                      />
-                    </div>
-                  </div>
+            {/* USUARIO */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Usuario
+              </label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  value={loginValue}
+                  onChange={(e) => setLoginValue(e.target.value)}
+                  placeholder="usuario1"
+                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                />
+              </div>
+            </div>
 
                   {/* PASSWORD */}
                   <div className="mb-4">
@@ -107,13 +107,13 @@ export default function Form() {
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
 
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="********"
-                        className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#39A900] focus:border-[#39A900] outline-none transition"
-                      />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="********"
+                  className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition"
+                />
 
                       <button
                         type="button"
