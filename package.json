@@ -28,13 +28,8 @@
     "@react-types/shared": "3.32.1",
     "@tailwindcss/postcss": "4.1.11",
     "@tailwindcss/vite": "4.1.11",
-<<<<<<< HEAD
-    "@tanstack/react-query": "^5.90.20",
-    "axios": "^1.13.2",
-=======
     "axios": "^1.13.6",
     "baseline-browser-mapping": "^2.10.0",
->>>>>>> Inicio
     "clsx": "2.1.1",
     "framer-motion": "11.18.2",
     "lucide-react": "^0.555.0",
