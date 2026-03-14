@@ -84,7 +84,7 @@ useEffect(()=>{
       }
   return (
     <DefaultLayout>
-        <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
+        {/* <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
           <div className="fixed top-24 right-20 z-50">
                     <ButtomCreate
                     onClick={() => {
@@ -136,22 +136,22 @@ useEffect(()=>{
                                 }}
                                 />
                 {/* Efecto de brillo en hover */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -translate-x-full group-hover:translate-x-full" />
+                {/* <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -translate-x-full group-hover:translate-x-full" />
                 
                 {/* Contenido */}
-                <div className="relative z-10">
+                {/* <div className="relative z-10">
                   <div className="flex items-center gap-3 mb-3">
                     
 
                     {/* Título del área */}
-                    <h3 className="text-white text-xl font-bold tracking-tight group-hover:text-blue-300 transition-colors duration-300">
+                    {/* <h3 className="text-white text-xl font-bold tracking-tight group-hover:text-blue-300 transition-colors duration-300">
                       {curso.codigo || 'Curso sin codigo'}
-                    </h3>
+                    </h3> */} 
 
                     
-                  </div>
+                  {/* </div> */}
                   {/* Icono decorativo */}
-                    <div className="w-13 h-13 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    {/* <div className="w-13 h-13 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
                       <svg 
                         className="w-10 h-10 text-white" 
                         fill="none" 
@@ -165,16 +165,16 @@ useEffect(()=>{
                           d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" 
                         />
                       </svg>
-                    </div>
+                    </div> */}
 
                   {/* Descripción o información adicional
                   <p className="text-gray-400 text-sm leading-relaxed group-hover:text-gray-300 transition-colors duration-300">
                     Haz clic para ver el seguimiento detallado
                   </p> */}
-                </div>
+                {/* </div> */}
 
                 {/* Indicador de acción */}
-                <div className="relative z-10 flex items-center justify-between mt-auto">
+                {/* <div className="relative z-10 flex items-center justify-between mt-auto">
                   <span className="text-xs text-gray-500 uppercase tracking-wider font-semibold">
                     Ver detalles
                   </span>
@@ -228,7 +228,7 @@ useEffect(()=>{
     setCursoSeleccionada(null);
   }}
   onGuardadoExitoso={handleGuardadoExitoso}
-/>
+/> */} 
 
     </DefaultLayout>
   )
