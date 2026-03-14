@@ -1,62 +1,58 @@
-import { Card, CardHeader, CardBody } from "@heroui/card";
+import { Card, CardBody } from "@heroui/card";
+import { Button } from "@heroui/button";
+import { useNavigate } from "react-router-dom";
 
 export function DashboardCards() {
+  const navigate = useNavigate();
+
   const cards = [
     {
       title: "Seguimiento",
+      description: "Lleva el control de la etapa productiva de los aprendices SENA.",
       img: "/img/biotic.jpg",
+      path: "/seguimiento",
     },
     {
       title: "Historial",
+      description: "Consulta a los aprendices certificados, en proceso y por certificar.",
       img: "/img/biotic.jpg",
+      path: "/docs",
     },
     {
       title: "Formatos",
+      description: "Accede y gestiona los formatos necesarios del proceso.",
       img: "/img/biotic.jpg",
+      path: "/format",
     },
-    {
-      title: "MiChat",
-      img: "/img/biotic.jpg",
-    }
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12 w-full px-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
       {cards.map((card, index) => (
         <Card
           key={index}
           isPressable
-          className="
-            transition-all duration-300 
-            hover:shadow-2xl 
-            hover:scale-[1.03] 
-            cursor-pointer
-            overflow-hidden
-            rounded-2xl
-            w-62
-            mx-auto
-          "
+          onPress={() => navigate(card.path)}
+          className="w-full rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 bg-white"
         >
-
-          {/* Imagen como fondo */}
-          <CardBody
-            className="
-              h-40 
-              bg-cover 
-              bg-center 
-              rounded-xl
-            "
-            style={{
-              backgroundImage: `url(${card.img})`,
-            }}
+          <img
+            src={card.img}
+            alt={card.title}
+            className="h-44 w-full object-cover"
           />
-
-          {/* Texto */}
-          <CardHeader className="flex flex-col items-start p-4">
-            <h3 className="text-lg font-semibold">{card.title}</h3>
-            <p className="text-3xl font-bold">{card.value}</p>
-          </CardHeader>
-
+          <CardBody className="p-5 flex flex-col gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">{card.title}</h3>
+              <p className="text-sm text-gray-600 mt-1">{card.description}</p>
+            </div>
+            <Button
+              color="primary"
+              className="mt-auto rounded-full w-full"
+              onPress={() => navigate(card.path)}
+            >
+              Ingresar
+            </Button>
+          </CardBody>
         </Card>
       ))}
     </div>

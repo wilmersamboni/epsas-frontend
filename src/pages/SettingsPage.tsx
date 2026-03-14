@@ -1,177 +1,183 @@
 import React, { useState } from 'react';
-import { User, Lock, Mail, Phone, MapPin, Save, Building2, Plus, Trash2, Edit, Hotel } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Save, Users, Transgender, KeyRoundIcon } from 'lucide-react';
 import { Navbar } from '@/components/navbar';
 import Sidebar from '@/components/sidebar';
 import { Footer } from '@/components/Footer';
 
-interface Centro {
-  id: number;
-  nombre: string;
-}
-
-interface Sede {
-  id: number;
-  nombre: string;
-  ubicacion: string;
-  codigo: string;
-}
+import axios from "axios";
+import { useEffect } from "react";
+import { useAuth } from '@/context/AuthContext';
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('perfil');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
-  const [formData, setFormData] = useState({
-    nombre: 'Daniela Sanchez',
-    email: 'daniela@example.com',
-    telefono: '+57 300 123 4567',
-    ubicacion: 'Pitalito, Huila',
+  const [perfilData, setPerfilData] = useState({
+    nombre: '',
+    email: '',
+    telefono: '',
+    ubicacion: '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
 
-  // centros de formación predeterminados, para mostrar como se ve
-  const [centros, setCentros] = useState<Centro[]>([
-    { id: 1, nombre: 'Centro de Formación Pitalito'},
-    { id: 2, nombre: 'Centro Industrial' }
-  ]);
+  const obtenerPerfil = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-  // centros de formación predeterminados, para mostrar como se ve
-  const [sedes, setSedes] = useState<Sede[]>([
-    { id: 1, nombre: 'Centro de Formación Pitalito', ubicacion: 'Pitalito, Huila', codigo: 'CFP001' },
-    { id: 2, nombre: 'Centro Industrial', ubicacion: 'Neiva, Huila', codigo: 'CIN002' }
-  ]);
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const personaId = payload.personaId;
 
-  //nuevo centro
-  const [nuevoCentro, setNuevoCentro] = useState({
-    nombre: ''
-  });
+    const response = await axios.get(
+      `http://localhost:3000/persona/buscar_jwsv/${personaId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+    const data = response.data;
+    console.log("DATA recibida:", data);
 
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
-  const [editandoCentro, setEditandoCentro] = useState<number | null>(null);
+    setPerfilData(prev => ({
+      ...prev,
+      nombre: data.nombre,
+      email: data.correo,
+      telefono: data.telefono,
+      ubicacion: data.direccion
+    }));
+    localStorage.setItem("correo", data.correo);
+  } catch (error) {
+    console.error("Error cargando perfil", error);
+  }
+};
+
+  useEffect(() => {
+  obtenerPerfil();
+  }, []);
+
+  const { actualizarUser } = useAuth();
+
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const personaId = payload.personaId;
+
+      const { data: perfilActual } = await axios.get(
+        `http://localhost:3000/persona/buscar_jwsv/${personaId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      await axios.put(
+        `http://localhost:3000/persona/actualizar_jwsv/${personaId}`,
+        {
+          nombre: perfilData.nombre,
+          correo: perfilData.email,
+          telefono: perfilData.telefono,
+          direccion: perfilData.ubicacion,
+          genero: perfilActual.genero,
+          fk_municipo: perfilActual.fk_municipo,
+          cargo: perfilActual.cargo,
+          estado: perfilActual.estado
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      actualizarUser({ nombre: perfilData.nombre });
+      localStorage.setItem("correo", perfilData.email);
+      alert("Perfil actualizado");
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleCentroInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setNuevoCentro(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSave = () => {
-    console.log('Guardando configuración:', formData);
-    alert('Configuración guardada exitosamente');
-  };
-
-  const agregarCentro = () => {
-    if (nuevoCentro.nombre) {
-      if (editandoCentro !== null) {
-        // editar centro
-        setCentros(centros.map(c => 
-          c.id === editandoCentro 
-            ? { ...nuevoCentro, id: editandoCentro }
-            : c
-        ));
-        setEditandoCentro(null);
-      } else {
-        // agregar centro
-        const nuevaId = Math.max(...centros.map(c => c.id), 0) + 1;
-        setCentros([...centros, { ...nuevoCentro, id: nuevaId }]);
-      }
-      
-      setNuevoCentro({ nombre: '' });
-      setMostrarFormulario(false);
-      alert('Centro guardado exitosamente');
-    } else {
-      alert('Por favor completa todos los campos');
-    }
-  };
-
-  const editarCentro = (centro: Centro) => {
-    setNuevoCentro({ nombre: centro.nombre});
-    setEditandoCentro(centro.id);
-    setMostrarFormulario(true);
-  };
-
-  const eliminarCentro = (id: number) => {
-    if (confirm('¿Estás seguro de eliminar este centro?')) {
-      setCentros(centros.filter(c => c.id !== id));
-      alert('Centro eliminado exitosamente');
-    }
-  };
-
-  const cancelarEdicion = () => {
-    setNuevoCentro({ nombre: '' });
-    setEditandoCentro(null);
-    setMostrarFormulario(false);
-  };
-
-  //nueva sede
-  const [nuevaSede, setNuevaSede] = useState({
-    nombre: '',
-    ubicacion: '',
-    codigo: ''
-  });
-
-  const [mostrarFormularioSede, setMostrarFormularioSede] = useState(false);
-  const [editandoSede, setEditandoSede] = useState<number | null>(null);
-
-  const handleSedeInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setNuevaSede(prev => ({ ...prev, [name]: value }));
-  };
-
-  const agregarSede = () => {
-    if (nuevaSede.nombre && nuevaSede.ubicacion && nuevaSede.codigo) {
-      if (editandoCentro !== null) {
-        // editar sede
-        setSedes(sedes.map(s => 
-          s.id === editandoSede 
-            ? { ...nuevaSede, id: editandoSede }
-            : s
-        ));
-        setEditandoSede(null);
-      } else {
-        // agregar sede
-        const nuevaId = Math.max(...sedes.map(s => s.id), 0) + 1;
-        setSedes([...sedes, { ...nuevaSede, id: nuevaId }]);
-      }
-      
-      setNuevaSede({ nombre: '', ubicacion: '', codigo: '' });
-      setMostrarFormularioSede(false);
-      alert('Sede guardada exitosamente');
-    } else {
-      alert('Por favor completa todos los campos');
-    }
-  };
-
-  const editarSede = (sede: Sede) => {
-    setNuevaSede({ nombre: sede.nombre, ubicacion: sede.ubicacion, codigo: sede.codigo });
-    setEditandoSede(sede.id);
-    setMostrarFormularioSede(true);
-  };
-
-  const eliminarSede = (id: number) => {
-    if (confirm('¿Estás seguro de eliminar esta Sede?')) {
-      setSedes(sedes.filter(s => s.id !== id));
-      alert('Sede eliminada exitosamente');
-    }
-  };
-
-  const cancelarEdicionSede = () => {
-    setNuevaSede({ nombre: '', ubicacion: '', codigo: '' });
-    setEditandoSede(null);
-    setMostrarFormularioSede(false);
+    setPerfilData(prev => ({ ...prev, [name]: value }));
   };
 
   const tabs = [
     { id: 'perfil', label: 'Perfil', icon: User },
-    { id: 'seguridad', label: 'Seguridad', icon: Lock },
-    { id: 'administrar', label: 'Administrar', icon: Building2 },
-    { id: 'sede', label: 'Sede', icon: Hotel }
+    { id: 'usuario', label: 'Usuario', icon: Users}
   ];
+
+  {/*crear los usuarios*/}
+  const [usuarioData, setUsuarioData] = useState({
+    nombre: "",
+    correo: "",
+    telefono: "",
+    direccion: "",
+    genero: "",
+    fk_municipio: "",
+    cargo: "",
+    login: "",
+    password: "",
+    fk_rol: ""
+  });
+  
+  const handleUsuarioChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setUsuarioData(prev => ({ ...prev, [name]: value }));
+  };
+  
+  const crearUsuario = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+    
+      //Crear persona
+      const personaRes = await axios.post(
+        "http://localhost:3000/persona/registrar_jwsv",
+        {
+          nombre: usuarioData.nombre,
+          telefono: usuarioData.telefono,
+          direccion: usuarioData.direccion,
+          correo: usuarioData.correo,
+          genero: usuarioData.genero,
+          fk_municipio: Number(usuarioData.fk_municipio),
+          cargo: usuarioData.cargo,
+          estado: "activo"
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const personaId = personaRes.data.id_persona;
+    
+      //vincula persona con aplicativo
+      const usuarioRes = await axios.post(
+        "http://localhost:3000/usuario/registrar_jwsv",
+        {
+          fk_persona: personaId,
+          fk_aplicativo: 1
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const usuarioId = usuarioRes.data.crearUsuario_jwsv.id_usuario;
+    
+      //Crear credencial
+      await axios.post(
+        "http://localhost:3000/credencial/registrar_jwsv",
+        {
+          login: usuarioData.login,
+          password: usuarioData.password,
+          fk_usuario: usuarioId,
+          fk_rol: Number(usuarioData.fk_rol)
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    
+      alert("Usuario creado correctamente");
+      setUsuarioData({
+        nombre: "", correo: "", telefono: "", direccion: "",
+        genero: "", fk_municipio: "", cargo: "", login: "", password: "", fk_rol: ""
+      });
+    } catch (error: any) {
+      console.error("Error al crear usuario:", error);
+      alert("Error: " + (error.response?.data?.error || error.message));
+    }
+  };
 
   return (
     <div className="flex h-screen">
@@ -185,14 +191,14 @@ export default function SettingsPage() {
       </div>
 
       {/* Contenido principal */}
-      <div className="flex flex-col flex-1 min-h-screen">
+      <div className="flex flex-col flex-1 min-h-screen  overflow-y-auto">
         {/* Navbar */}
-        <div className="flex items-center px-4 h-16 border-b bg-white">
+        <div className="flex items-center px-0 h-16 border-b bg-white">
           <Navbar />
         </div>
 
         {/* Contenido de configuración */}
-        <main className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+        <main className="flex-1 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
           <div className="h-full p-4">
           <div className="max-w-6xl mx-auto h-full flex flex-col">
             
@@ -205,7 +211,7 @@ export default function SettingsPage() {
               
               {/* sidebar de configuracion*/}
               <div className="md:col-span-1 overflow-y-auto">
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-3 border border-white/20 h-full sticky top-0">
+                <div className="bg-white/10 backdrop-blur-lg rounded-xl md:rounded-2xl p-2 sm:p-3 md:p-4 border border-white/20 h-auto md:h-full sticky md:top-0">
                   {tabs.map((tab) => {
                     const Icon = tab.icon;
                     return (
@@ -227,8 +233,8 @@ export default function SettingsPage() {
               </div>
 
               {/* contenido principal, lado izquierdo */}
-              <div className="md:col-span-3 overflow-y-auto">
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 h-full">
+              <div className="md:col-span-3">
+                <div className="bg-white/10 backdrop-blur-lg rounded-xl md:rounded-2xl p-4 sm:p-5 md:p-6 border border-white/20 h-auto md:h-full">
                   
                   {/* perfil del sidebar de configuracion */}
                   {activeTab === 'perfil' && (
@@ -237,7 +243,9 @@ export default function SettingsPage() {
                       
                       <div className="flex items-center gap-6 mb-6">
                         <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-3xl font-bold">
-                          DS
+                          {perfilData.nombre
+                            ? perfilData.nombre.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+                            : 'US'}
                         </div>
                         <div>
                           <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
@@ -255,7 +263,7 @@ export default function SettingsPage() {
                           <input
                             type="text"
                             name="nombre"
-                            value={formData.nombre}
+                            value={perfilData.nombre}
                             onChange={handleInputChange}
                             className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
                           />
@@ -269,7 +277,7 @@ export default function SettingsPage() {
                           <input
                             type="email"
                             name="email"
-                            value={formData.email}
+                            value={perfilData.email}
                             onChange={handleInputChange}
                             className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
                           />
@@ -283,7 +291,7 @@ export default function SettingsPage() {
                           <input
                             type="tel"
                             name="telefono"
-                            value={formData.telefono}
+                            value={perfilData.telefono}
                             onChange={handleInputChange}
                             className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
                           />
@@ -297,306 +305,208 @@ export default function SettingsPage() {
                           <input
                             type="text"
                             name="ubicacion"
-                            value={formData.ubicacion}
+                            value={perfilData.ubicacion}
                             onChange={handleInputChange}
                             className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
                           />
                         </div>
+
+                        {/* Botón guardar */}
+                        <div className="flex justify-end pt-4">
+                          <button
+                            onClick={handleSave}
+                            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+                          >
+                            <Save size={18} />
+                            Guardar cambios
+                          </button>
+                        </div>
+
                       </div>
                     </div>
                   )}
-
-                  {/* seguridad del sidebar de configuracion */}
-                  {activeTab === 'seguridad' && (
+                  {/* usuario del sidebar de configuracion */}
+                  {activeTab === 'usuario' && (
                     <div className="space-y-4">
-                      <h2 className="text-2xl font-bold text-white mb-4">Seguridad y Contraseña</h2>
-                      
-                      <div className="space-y-4">
+                      <h2 className="text-2xl font-bold text-white mb-4">Crear Usuario</h2>
+                  
+                      <div className="grid md:grid-cols-2 gap-6">
+                        {/* Nombre */}
                         <div>
                           <label className="block text-white mb-2 font-medium">
-                            <Lock className="inline mr-2" size={18} />
-                            Contraseña actual
+                            <User className="inline mr-2" size={18} />
+                            Nombre completo
+                          </label>
+                          <input
+                            type="text"
+                            name="nombre"
+                            value={usuarioData.nombre}
+                            onChange={handleUsuarioChange}
+                            placeholder="Ej: Juan Pérez"
+                            className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
+                          />
+                        </div>
+                  
+                        {/* Correo */}
+                        <div>
+                          <label className="block text-white mb-2 font-medium">
+                            <Mail className="inline mr-2" size={18} />
+                            Email
+                          </label>
+                          <input
+                            type="email"
+                            name="correo"
+                            value={usuarioData.correo}
+                            onChange={handleUsuarioChange}
+                            placeholder="correo@ejemplo.com"
+                            className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
+                          />
+                        </div>
+                  
+                        {/* Teléfono */}
+                        <div>
+                          <label className="block text-white mb-2 font-medium">
+                            <Phone className="inline mr-2" size={18} />
+                            Teléfono
+                          </label>
+                          <input
+                            type="tel"
+                            name="telefono"
+                            value={usuarioData.telefono}
+                            onChange={handleUsuarioChange}
+                            placeholder="3001234567"
+                            className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
+                          />
+                        </div>
+                  
+                        {/* Dirección */}
+                        <div>
+                          <label className="block text-white mb-2 font-medium">
+                            <MapPin className="inline mr-2" size={18} />
+                            Dirección
+                          </label>
+                          <input
+                            type="text"
+                            name="direccion"
+                            value={usuarioData.direccion}
+                            onChange={handleUsuarioChange}
+                            placeholder="Calle 123 # 45-67"
+                            className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
+                          />
+                        </div>
+                  
+                        {/* Género */}
+                        <div>
+                          <label className="block text-white mb-2 font-medium">
+                            <Transgender className="inline mr-2" size={18} />
+                            Género
+                          </label>
+                          <select
+                            name="genero"
+                            value={usuarioData.genero}
+                            onChange={handleUsuarioChange}
+                            className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
+                          >
+                            <option value="" className="bg-slate-800">Seleccionar...</option>
+                            <option value="masculino" className="bg-slate-800">Masculino</option>
+                            <option value="femenino" className="bg-slate-800">Femenino</option>
+                          </select>
+                        </div>
+                  
+                        {/* Cargo */}
+                        <div>
+                          <label className="block text-white mb-2 font-medium">
+                            <KeyRoundIcon className="inline mr-2" size={18} />
+                            Cargo
+                          </label>
+                          <select
+                            name="cargo"
+                            value={usuarioData.cargo}
+                            onChange={handleUsuarioChange}
+                            className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
+                          >
+                            <option value="" className="bg-slate-800">Seleccionar...</option>
+                            <option value="administrador" className="bg-slate-800">Administrador</option>
+                            <option value="instructor" className="bg-slate-800">Instructor</option>
+                            <option value="aprendiz" className="bg-slate-800">Aprendiz</option>
+                          </select>
+                        </div>
+                  
+                        {/* Municipio */}
+                        <div>
+                          <label className="block text-white mb-2 font-medium">
+                            <MapPin className="inline mr-2" size={18} />
+                            ID Municipio
+                          </label>
+                          <input
+                            type="number"
+                            name="fk_municipio"
+                            value={usuarioData.fk_municipio}
+                            onChange={handleUsuarioChange}
+                            placeholder="ID del municipio"
+                            className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
+                          />
+                        </div>
+                  
+                        {/* Rol */}
+                        <div>
+                          <label className="block text-white mb-2 font-medium">
+                            <Users className="inline mr-2" size={18} />
+                            ID Rol
+                          </label>
+                          <input
+                            type="number"
+                            name="fk_rol"
+                            value={usuarioData.fk_rol}
+                            onChange={handleUsuarioChange}
+                            placeholder="ID del rol"
+                            className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
+                          />
+                        </div>
+                  
+                        {/* Login */}
+                        <div>
+                          <label className="block text-white mb-2 font-medium">
+                            <User className="inline mr-2" size={18} />
+                            Login (usuario)
+                          </label>
+                          <input
+                            type="text"
+                            name="login"
+                            value={usuarioData.login}
+                            onChange={handleUsuarioChange}
+                            placeholder="nombre_usuario"
+                            className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
+                          />
+                        </div>
+                  
+                        {/* Password */}
+                        <div>
+                          <label className="block text-white mb-2 font-medium">
+                            <KeyRoundIcon className="inline mr-2" size={18} />
+                            Contraseña
                           </label>
                           <input
                             type="password"
-                            name="currentPassword"
-                            value={formData.currentPassword}
-                            onChange={handleInputChange}
-                            placeholder="Ingresa tu contraseña actual"
+                            name="password"
+                            value={usuarioData.password}
+                            onChange={handleUsuarioChange}
+                            placeholder="••••••••"
                             className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
                           />
                         </div>
-
-                        <div>
-                          <label className="block text-white mb-2 font-medium">Nueva contraseña</label>
-                          <input
-                            type="password"
-                            name="newPassword"
-                            value={formData.newPassword}
-                            onChange={handleInputChange}
-                            placeholder="Mínimo 8 caracteres"
-                            className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-white mb-2 font-medium">Confirmar contraseña</label>
-                          <input
-                            type="password"
-                            name="confirmPassword"
-                            value={formData.confirmPassword}
-                            onChange={handleInputChange}
-                            placeholder="Confirma tu nueva contraseña"
-                            className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
-                          />
+                  
+                        {/* Botón crear */}
+                        <div className="md:col-span-2 flex justify-end pt-4">
+                          <button
+                            onClick={crearUsuario}
+                            className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
+                          >
+                            <Save size={18} />
+                            Crear usuario
+                          </button>
                         </div>
                       </div>
-                    </div>
-                  )}
-
-                  {/* administrar Centros  del sidebar de configuracion*/}
-                  {activeTab === 'administrar' && (
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-2xl font-bold text-white">Centros de Formación</h2>
-                        <button
-                          onClick={() => setMostrarFormulario(!mostrarFormulario)}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
-                        >
-                          <Plus size={20} />
-                          Nuevo Centro
-                        </button>
-                      </div>
-
-                      {/* crud de centro */}
-                      {mostrarFormulario && (
-                        <div className="bg-blue-900/30 border border-blue-500/50 rounded-lg p-6 mb-6">
-                          <h3 className="text-xl font-bold text-white mb-4">
-                            {editandoCentro ? 'Editar Centro' : 'Agregar Nuevo Centro'}
-                          </h3>
-                          
-                          <div className="grid md:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-white mb-2">Nombre del Centro</label>
-                              <input
-                                type="text"
-                                name="nombre"
-                                value={nuevoCentro.nombre}
-                                onChange={handleCentroInputChange}
-                                placeholder="Ej: Centro de Formación Pitalito"
-                                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-blue-500 outline-none"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="flex gap-3 mt-4">
-                            <button
-                              onClick={agregarCentro}
-                              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-                            >
-                              {editandoCentro ? 'Actualizar' : 'Guardar'}
-                            </button>
-                            <button
-                              onClick={cancelarEdicion}
-                              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
-                            >
-                              Cancelar
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* lista de centros */}
-                      <div className="space-y-4">
-                        {centros.length === 0 ? (
-                          <div className="text-center py-12">
-                            <Building2 className="w-16 h-16 text-white/30 mx-auto mb-4" />
-                            <p className="text-white/60">No hay centros registrados</p>
-                          </div>
-                        ) : (
-                          centros.map((centro) => (
-                            <div
-                              key={centro.id}
-                              className="bg-white/5 border border-white/20 rounded-lg p-4 hover:bg-white/10 transition"
-                            >
-                              <div className="flex justify-between items-start">
-                                <div className="flex gap-4">
-                                  <div className="w-12 h-12 rounded-lg bg-blue-600 flex items-center justify-center">
-                                    <Building2 className="text-white" size={24} />
-                                  </div>
-                                  <div>
-                                    <h3 className="text-white font-bold text-lg">{centro.nombre}</h3>
-                                  </div>
-                                </div>
-
-                                <div className="flex gap-2">
-                                  <button
-                                    onClick={() => editarCentro(centro)}
-                                    className="p-2 bg-blue-600/50 hover:bg-blue-600 text-white rounded-lg transition"
-                                    title="Editar"
-                                  >
-                                    <Edit size={18} />
-                                  </button>
-                                  <button
-                                    onClick={() => eliminarCentro(centro.id)}
-                                    className="p-2 bg-red-600/50 hover:bg-red-600 text-white rounded-lg transition"
-                                    title="Eliminar"
-                                  >
-                                    <Trash2 size={18} />
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* administrar sedes  del sidebar de configuracion*/}
-                  {activeTab === 'sede' && (
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-2xl font-bold text-white">Sedes</h2>
-                        <button
-                          onClick={() => setMostrarFormularioSede(!mostrarFormularioSede)}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
-                        >
-                          <Plus size={20} />
-                          Nueva Sede
-                        </button>
-                      </div>
-
-                      {/* crud de sede */}
-                      {mostrarFormularioSede && (
-                        <div className="bg-blue-900/30 border border-blue-500/50 rounded-lg p-6 mb-6">
-                          <h3 className="text-xl font-bold text-white mb-4">
-                            {editandoSede ? 'Editar Sede' : 'Agregar Nueva Sede'}
-                          </h3>
-                          
-                          <div className="grid md:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-white mb-2">Nombre de la sede</label>
-                              <input
-                                type="text"
-                                name="nombre"
-                                value={nuevaSede.nombre}
-                                onChange={handleSedeInputChange}
-                                placeholder="Ej: sede de Formación Pitalito"
-                                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-blue-500 outline-none"
-                              />
-                            </div>
-
-                            <div>
-                              <label className="block text-white mb-2">Código</label>
-                              <input
-                                type="text"
-                                name="codigo"
-                                value={nuevaSede.codigo}
-                                onChange={handleSedeInputChange}
-                                placeholder="Ej: 001"
-                                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-blue-500 outline-none"
-                              />
-                            </div>
-
-                            <div className="md:col-span-2">
-                              <label className="block text-white mb-2">Ubicación</label>
-                              <input
-                                type="text"
-                                name="ubicacion"
-                                value={nuevaSede.ubicacion}
-                                onChange={handleSedeInputChange}
-                                placeholder="Ej: Pitalito, Huila"
-                                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-blue-500 outline-none"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="flex gap-3 mt-4">
-                            <button
-                              onClick={agregarSede}
-                              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-                            >
-                              {editandoSede ? 'Actualizar' : 'Guardar'}
-                            </button>
-                            <button
-                              onClick={cancelarEdicionSede}
-                              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
-                            >
-                              Cancelar
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* lista de sedes */}
-                      <div className="space-y-4">
-                        {sedes.length === 0 ? (
-                          <div className="text-center py-12">
-                            <Building2 className="w-16 h-16 text-white/30 mx-auto mb-4" />
-                            <p className="text-white/60">No hay sedes registradas</p>
-                          </div>
-                        ) : (
-                          sedes.map((sede) => (
-                            <div
-                              key={sede.id}
-                              className="bg-white/5 border border-white/20 rounded-lg p-4 hover:bg-white/10 transition"
-                            >
-                              <div className="flex justify-between items-start">
-                                <div className="flex gap-4">
-                                  <div className="w-12 h-12 rounded-lg bg-blue-600 flex items-center justify-center">
-                                    <Hotel className="text-white" size={24} />
-                                  </div>
-                                  <div>
-                                    <h3 className="text-white font-bold text-lg">{sede.nombre}</h3>
-                                    <p className="text-white/60 text-sm">
-                                      <MapPin className="inline w-4 h-4 mr-1" />
-                                      {sede.ubicacion}
-                                    </p>
-                                    <p className="text-blue-400 text-sm mt-1">Código: {sede.codigo}</p>
-                                  </div>
-                                </div>
-
-                                <div className="flex gap-2">
-                                  <button
-                                    onClick={() => editarSede(sede)}
-                                    className="p-2 bg-blue-600/50 hover:bg-blue-600 text-white rounded-lg transition"
-                                    title="Editar"
-                                  >
-                                    <Edit size={18} />
-                                  </button>
-                                  <button
-                                    onClick={() => eliminarSede(sede.id)}
-                                    className="p-2 bg-red-600/50 hover:bg-red-600 text-white rounded-lg transition"
-                                    title="Eliminar"
-                                  >
-                                    <Trash2 size={18} />
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* botones de acción (solo para perfil y seguridad) */}
-                  {(activeTab === 'perfil' || activeTab === 'seguridad') && (
-                    <div className="mt-4 flex justify-end gap-4">
-                      <button
-                        onClick={() => window.history.back()}
-                        className="px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition"
-                      >
-                        Cancelar
-                      </button>
-                      <button
-                        onClick={handleSave}
-                        className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition flex items-center gap-2"
-                      >
-                        <Save size={20} />
-                        Guardar cambios
-                      </button>
                     </div>
                   )}
                 </div>
@@ -607,7 +517,7 @@ export default function SettingsPage() {
         </main>
 
         {/* Footer */}
-        <Footer className="rounded-r-xl" />
+        <Footer/>
       </div>
     </div>
   );

@@ -1,12 +1,9 @@
-import { Card } from "@heroui/react";
 import {
   Users,
   Home,
   FileText,
   Clock,
-  MessageCircle,
   LogOut,
-  KeyRound,
 } from "lucide-react";
 import { ReactNode } from "react";
 import PerfilPopover from "@/components/perfil";
@@ -28,29 +25,30 @@ export default function Sidebar({ open }: { open: boolean }) {
     { label: "Seguimiento", icon: <Users />, href: "/seguimiento" },
     { label: "Historial", icon: <Clock />, href: "/docs" },
     { label: "Formatos", icon: <FileText />, href: "/format" },
-    { label: "MiChat", icon: <MessageCircle />, href: "/blog" }
   ];
 
   const handleLogout = () => {
-    logout(); // limpia sesión
+    logout();
     navigate("/login", { replace: true });
   };
 
   return (
-    <Card
+    <div
       className={`
-        h-screen p-4 bg-gray-900 text-white transition-all duration-300
+        h-screen p-4 bg-[#00304D] text-white transition-all duration-300
         ${open ? "w-64" : "w-20"}
-        rounded-none flex flex-col
+        flex flex-col shadow-2xl
       `}
     >
       {/* PERFIL */}
-      <div className="mb-6">
-        <PerfilPopover />
-      </div>
+      {/* PERFIL */}
+        <div className="mb-6">
+          <PerfilPopover open={open} />  {/* 👈 agrega open aquí */}
+        </div>
 
+      {/* TÍTULO MENÚ */}
       <h2
-        className={`text-xl font-bold mb-6 transition-opacity ${
+        className={`text-xl font-bold mb-6 transition-opacity duration-300 ${
           open ? "opacity-100" : "opacity-0 hidden"
         }`}
       >
@@ -58,15 +56,15 @@ export default function Sidebar({ open }: { open: boolean }) {
       </h2>
 
       {/* LINKS */}
-      <nav className="flex flex-col gap-4 mt-2">
+      <nav className="flex flex-col gap-2 mt-2">
         {links.map((item, index) => (
           <button
             key={index}
             onClick={() => navigate(item.href)}
-            className="flex items-center gap-3 p-3 hover:bg-gray-700 transition rounded-xl text-left"
+            className="flex items-center gap-3 p-3 rounded-xl text-left transition-all hover:bg-[#39A900] hover:text-white"
           >
-            {item.icon}
-            {open && <span>{item.label}</span>}
+            <span className="min-w-[24px] flex justify-center">{item.icon}</span>
+            {open && <span className="whitespace-nowrap">{item.label}</span>}
           </button>
         ))}
       </nav>
@@ -75,12 +73,12 @@ export default function Sidebar({ open }: { open: boolean }) {
       <div className="mt-auto">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-600 transition text-left"
+          className="w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all hover:bg-red-700 hover:text-white"
         >
-          <LogOut />
-          {open && <span>Cerrar Sesión</span>}
+          <span className="min-w-[24px] flex justify-center"><LogOut /></span>
+          {open && <span className="whitespace-nowrap">Cerrar Sesión</span>}
         </button>
       </div>
-    </Card>
+    </div>
   );
 }
