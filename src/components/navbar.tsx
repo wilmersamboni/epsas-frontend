@@ -1,99 +1,43 @@
-import { Link } from "@heroui/link";
 import { Input } from "@heroui/input";
+import { Search } from "lucide-react";
+import { Link } from "@heroui/link";
 import {
-  Navbar as HeroUINavbar,
-  NavbarBrand,
-  NavbarContent,
-  NavbarItem,
-  NavbarMenuToggle,
-  NavbarMenu,
-  NavbarMenuItem,
+  Navbar as HeroUINavbar, NavbarBrand,
+  NavbarContent, NavbarItem,
 } from "@heroui/navbar";
-import { siteConfig } from "@/config/site";
-import { SearchCheckIcon } from "lucide-react";
-import { TwitterIcon } from "@/components/icons";
 
-export const Navbar = () => {
-  const searchInput = (
-    <Input
-      aria-label="Search"
-      classNames={{
-        inputWrapper: "bg-white/10 border border-white/20",
-        input: "text-sm text-white placeholder:text-white/50",
-      }}
-    
-      labelPlacement="outside"
-      placeholder="Search..."
-      startContent={
-        <SearchCheckIcon className="text-white/60 pointer-events-none flex-shrink-0" />
-      }
-      type="search"
-    />
-  );
-
-  return (
-    <HeroUINavbar
-      maxWidth="full"
-      position="sticky"
-      className="bg-[#00304D] text-white border-b border-[#004d7a] shadow-md"
-    >
-      {/* LOGO */}
-      <NavbarContent className="basis-auto sm:basis-full" justify="start">
-        <NavbarBrand className="gap-0 max-w-fit">
-          <Link
-            className="flex justify-start items-center gap-1 text-white"
-            color="foreground"
-            href="/"
-          >
-            <img
-              src="public/img/logo.png"
-              className="h-10 w-auto object-contain"
-            />
-            <p className="font-bold text-white">EPSAS</p>
-          </Link>
-        </NavbarBrand>
-      </NavbarContent>
-
-      {/* DERECHA DESKTOP */}
-      <NavbarContent
-        className="hidden sm:flex basis-1/5 sm:basis-full"
-        justify="end"
-      >
-        <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-      </NavbarContent>
-
-      {/* DERECHA MOBILE */}
-      <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
-        <Link isExternal href={siteConfig.links.github}>
-          <TwitterIcon className="text-white" />
+export const Navbar = () => (
+  <HeroUINavbar
+    maxWidth="full"
+    position="sticky"
+    className="bg-[#001f33] h-14 border-b border-white/5"
+  >
+    <NavbarContent justify="start">
+      <NavbarBrand>
+        <Link href="/" className="flex items-center gap-2">
+          <img src="/img/logo.png" className="h-7 w-auto object-contain" />
+          <span className="font-semibold text-white text-sm tracking-wide">EPSAS</span>
         </Link>
-        <NavbarMenuToggle className="text-white" />
-      </NavbarContent>
+      </NavbarBrand>
+    </NavbarContent>
 
-      {/* MENÚ MOBILE */}
-      <NavbarMenu className="bg-[#00304D] pt-4">
-        {searchInput}
-        <div className="mx-4 mt-2 flex flex-col gap-2">
-          {siteConfig.navMenuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`}>
-              <Link
-                color={
-                  index === 2
-                    ? "primary"
-                    : index === siteConfig.navMenuItems.length - 1
-                      ? "danger"
-                      : "foreground"
-                }
-                className="text-white"
-                href="#"
-                size="lg"
-              >
-                {item.label}
-              </Link>
-            </NavbarMenuItem>
-          ))}
-        </div>
-      </NavbarMenu>
-    </HeroUINavbar>
-  );
-};
+    <NavbarContent justify="end">
+      <NavbarItem>
+        <Input
+          aria-label="Buscar"
+          classNames={{
+            inputWrapper: [
+              "bg-white/5 border border-white/10",
+              "hover:border-white/20 focus-within:border-[#39A900]/60",
+              "transition-colors h-8 w-64",
+            ].join(" "),
+            input: "text-xs text-white placeholder:text-white/30",
+          }}
+          placeholder="Buscar..."
+          startContent={<Search size={13} className="text-white/30 flex-shrink-0" />}
+          type="search"
+        />
+      </NavbarItem>
+    </NavbarContent>
+  </HeroUINavbar>
+);

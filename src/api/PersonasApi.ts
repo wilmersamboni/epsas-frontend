@@ -5,9 +5,9 @@ export const listar_personas= async(datos)=>{
     return responde.data
 }
 
-export const listar_aprendices = async (datos) => {
+export const listar_aprendices = async () => {
 
-  const response = await conexionDb.get("persona/aprendices", datos)
+  const response = await conexionDb.get("persona/aprendices")
 
   return response.data;
 };
