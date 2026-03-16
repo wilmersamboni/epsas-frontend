@@ -49,7 +49,7 @@ export default function Form() {
     >
       <div className="w-full max-w-6xl mx-auto relative z-10 grid md:grid-cols-2 rounded-3xl">
 
-        {/* IZQUIERDA */}
+        {/* izquierda */}
         <div className="bg-gradient-to-br from-[#39A900] to-[#007832] p-12 flex flex-col justify-between rounded-l-3xl shadow-2xl text-white">
           <div>
             <h2 className="text-4xl font-bold mb-6">
@@ -74,7 +74,7 @@ export default function Form() {
           </div>
         </div>
 
-        {/* DERECHA */}
+        {/* derecha */}
         <div className="bg-[#F6F6F6] p-12 flex flex-col justify-center rounded-r-3xl shadow-2xl">
           <form onSubmit={onSubmit}>
             <h2 className="text-3xl font-bold text-[#00304D] mb-3">
@@ -90,7 +90,7 @@ export default function Form() {
                     </div>
                   )}
 
-            {/* USUARIO */}
+            {/* usuario */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-[#000000] mb-2">
                 Usuario
@@ -107,7 +107,7 @@ export default function Form() {
               </div>
             </div>
           
-            {/* PASSWORD */}
+            {/* contraseña */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-[#000000] mb-2">
                 Contraseña
@@ -137,7 +137,7 @@ export default function Form() {
               </div>
             </div>
                 
-            {/* OLVIDASTE */}
+            {/* olvidar contraseña */}
             <div className="text-right mb-8">
               <button
                 type="button"
@@ -148,7 +148,7 @@ export default function Form() {
               </button>
             </div>
 
-            {/* BOTÓN */}
+            {/* boton de ingresar */}
             <button
               type="submit"
               disabled={submitting}

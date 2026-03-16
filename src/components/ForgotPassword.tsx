@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, ArrowLeft, Check, Lock, ShieldCheck, KeyRound } from 'lucide-react';
+import { Mail, ArrowLeft, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { solicitarRecuperacion, verificarCodigo, cambiarPassword } from '@/api/authApi';
 
@@ -10,7 +10,7 @@ const PasswordRecovery: React.FC = () => {
   const [newPassword, setNewPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
 
-  const [step, setStep] = useState<1 | 2 | 3 | 4>(1); // 1: Email, 2: Code, 3: New Password, 4: Success
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,8 +43,10 @@ const PasswordRecovery: React.FC = () => {
   };
 
   const handleCambiar = async () => {
-    if (!newPassword || !confirmPassword) return setError("Todos los campos son obligatorios");
-    if (newPassword !== confirmPassword) return setError("Las contraseñas no coinciden");
+    if (!newPassword || !confirmPassword)
+      return setError("Todos los campos son obligatorios");
+    if (newPassword !== confirmPassword)
+      return setError("Las contraseñas no coinciden");
 
     try {
       setLoading(true);
@@ -59,119 +61,169 @@ const PasswordRecovery: React.FC = () => {
   };
 
   return (
-            <div className="min-h-screen bg-gradient-to-br from-[#00304D] via-[#007832] to-[#00304D] flex items-center justify-center p-4 relative overflow-hidden">
-            
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              <div className="absolute top-20 left-10 w-72 h-72 bg-[#39A900] rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
-              <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#007832] rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse delay-700"></div>
+    <div className="min-h-screen flex items-center justify-center p-4 relative"
+      style={{
+        backgroundColor: '#ced4d9',
+        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpolygon points='20,4 36,13 36,31 20,40 4,31 4,13' fill='none' stroke='white' stroke-width='1' opacity='0.35'/%3E%3Ccircle cx='58' cy='20' r='2.5' fill='white' opacity='0.28'/%3E%3Ccircle cx='58' cy='60' r='2.5' fill='white' opacity='0.1'/%3E%3Crect x='52' y='2' width='14' height='14' rx='2' fill='none' stroke='white' stroke-width='0.9' opacity='0.1' transform='rotate(20 59 9)'/%3E%3Cline x1='50' y1='40' x2='70' y2='60' stroke='white' stroke-width='0.8' opacity='0.08'/%3E%3C/svg%3E")`,
+      }}>
+
+      <div className="w-full max-w-6xl mx-auto relative z-10 grid md:grid-cols-2 rounded-3xl">
+
+        {/* izquierda */}
+        <div className="bg-gradient-to-br from-[#39A900] to-[#007832] p-12 flex flex-col justify-between rounded-l-3xl shadow-2xl text-white">
+          <div>
+            <h2 className="text-4xl font-bold mb-6">
+              ¿Olvidaste tu contraseña?
+            </h2>
+
+            <p className="text-lg opacity-90">
+              Para recueprar tu accceso al sistema de manera segura, sigue los siguentes pasos.
+            </p>
+          </div>
+
+          <div className="flex justify-center items-center my-8">
+              <img src="public/img/logo.png" className="h-50 w-auto object-contain drop-shadow-2xl"
+              style={{
+                animation: "float 3s ease-in-out infinite",
+                filter: "drop-shadow(0 0 20px rgba(57, 169, 0, 0.4))"
+              }}
+              />
             </div>
 
-            <div className="w-full max-w-6xl mx-auto grid md:grid-cols-2 gap-0 relative z-10">
-              
-              {/* izquierda */}
-              <div className="bg-gradient-to-br from-[#39A900] to-[#007832] p-12 flex flex-col justify-between rounded-l-3xl shadow-2xl text-white">
-                
-                <div>
-                  <h2 className="text-4xl font-bold mb-6">¿Olvidaste tu Contraseña?</h2>
-                  <p className="text-white/90 text-lg mb-8">
-                    No te preocupes, sigue las instrucciones para restablecer tu contraseña.
-                  </p>
-                </div>
+          <button
+            onClick={() => navigate("/login")}
+            className="flex items-center gap-2 text-sm"
+          >
+            <ArrowLeft size={16}/>
+            Volver al login
+          </button>
 
-                <div>
-                  <button 
-                    onClick={() => window.history.back()}
-                    className="text-white hover:text-[#00304D] transition-colors flex items-center gap-2 text-sm bg-transparent border-none cursor-pointer"
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                    Volver al inicio de sesión
-                  </button>
-                </div>
+        </div>
+
+        {/* derecha */}
+        <div className="bg-[#F6F6F6] p-12 flex flex-col justify-center rounded-r-3xl shadow-2xl">
+
+          {/* paso 1 */}
+          {step === 1 && (
+            <>
+              <h2 className="text-3xl font-bold text-[#00304D] mb-6">
+                Recuperar contraseña
+              </h2>
+
+              <p className="text-gray-600 mb-8">
+                Ingresa tu correo para cambiar contraseña
+              </p>
+
+              <label className="block text-sm font-medium text-[#000000] mb-2">
+                Correo
+              </label>
+
+              <div className="relative mb-6">
+                <Mail className="absolute left-3 top-3 text-gray-400"/>
+                <input
+                  type="email"
+                  placeholder="correo@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border rounded-lg"
+                />
               </div>
 
-              {/* derecha formulario*/}
-              <div className="bg-[#F6F6F6] p-12 flex flex-col justify-center rounded-r-3xl shadow-2xl">
-                {!isSubmitted ? (
-                  <>
-                    <div className="mb-8">
-                      <h2 className="text-3xl font-bold text-[#00304D] mb-3">
-                        Recuperar Contraseña
-                      </h2>
-                      <p className="text-gray-600">
-                        Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
-                      </p>
-                    </div>
-
-                    <div className="space-y-6">
-                      <div>
-                        <label className="block text-sm font-medium text-[#000000] mb-2">
-                          Correo Electrónico
-                        </label>
-                        <div className="relative">
-                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                          <input
-                            type="email"
-                            value={email}
-                            onChange={handleEmailChange}
-                            onKeyPress={handleKeyPress}
-                            placeholder="correo@email.com"
-                            required
-                            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#39A900] focus:border-[#39A900] outline-none transition-all"
-                          />
-                        </div>
-                      </div>
-
-                      <button
-                        onClick={handleSubmit}
-                        className="w-full bg-gradient-to-r from-[#39A900] to-[#007832] text-white py-3 rounded-lg font-medium hover:from-[#007832] hover:to-[#00304D] transform hover:scale-[1.02] transition-all shadow-lg hover:shadow-xl"
-                      >
-                        Enviar Enlace de Recuperación
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  //despues de enviar el correo muestra la validacion
-                  <div className="text-center">
-                    <div className="w-20 h-20 bg-[#39A900]/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <Check className="w-10 h-10 text-[#007832]" />
-                    </div>
-                    
-                    <h2 className="text-3xl font-bold text-[#00304D] mb-3">
-                      ¡Correo Enviado!
-                    </h2>
-                    
-                    <p className="text-gray-600 mb-8">
-                      Hemos enviado un enlace de recuperación a<br />
-                      <span className="font-medium text-[#00304D]">{email}</span>
-                    </p>
-
-                    <div className="bg-[#39A900]/10 border border-[#39A900]/30 rounded-lg p-4 mb-6">
-                      <p className="text-sm text-gray-700">
-                        Revisa tu bandeja de entrada y sigue las instrucciones. Si no ves el correo, verifica tu carpeta de spam.
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={handleBack}
-                      className="w-full bg-white border border-gray-300 text-[#00304D] py-3 rounded-lg font-medium hover:bg-gray-100 transition-all"
-                    >
-                      Volver
-                    </button>
-
-                    <p className="text-sm text-gray-600 mt-6">
-                      ¿No recibiste el correo?{' '}
-                      <button 
-                        onClick={handleSubmit}
-                        className="text-[#007832] font-medium hover:text-[#39A900] transition-colors bg-transparent border-none cursor-pointer"
-                      >
-                        Reenviar
-                      </button>
-                    </p>
+              {error && (
+                  <div className="mb-4 text-red-500 text-sm">
+                    {error}
                   </div>
                 )}
-              </div>
+
+              <button
+                onClick={handleSolicitar}
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-[#39A900] to-[#007832] text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 hover:from-[#007832] hover:to-[#00304D] transition-all shadow-lg hover:shadow-xl disabled:opacity-50"
+              >
+                {loading ? "Enviando..." : "Enviar código"}
+              </button>
+            </>
+          )}
+
+          {/* paso 2 */}
+          {step === 2 && (
+            <>
+              <h2 className="text-3xl font-bold text-[#00304D] mb-6">
+                Verificar código
+              </h2>
+
+              <input
+                type="text"
+                placeholder="Código recibido"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                className="w-full px-4 py-3 border rounded-lg mb-6"
+              />
+
+              <button
+                onClick={handleVerificar}
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-[#39A900] to-[#007832] text-white py-3 rounded-lg"
+              >
+                {loading ? "Verificando..." : "Verificar código"}
+              </button>
+            </>
+          )}
+
+          {/* paso 3 */}
+          {step === 3 && (
+            <>
+              <h2 className="text-3xl font-bold text-[#00304D] mb-6">
+                Nueva contraseña
+              </h2>
+
+              <input
+                type="password"
+                placeholder="Nueva contraseña"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full px-4 py-3 border rounded-lg mb-4"
+              />
+
+              <input
+                type="password"
+                placeholder="Confirmar contraseña"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full px-4 py-3 border rounded-lg mb-6"
+              />
+
+              <button
+                onClick={handleCambiar}
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-[#39A900] to-[#007832] text-white py-3 rounded-lg"
+              >
+                {loading ? "Cambiando..." : "Cambiar contraseña"}
+              </button>
+            </>
+          )}
+
+          {/* paso 4 */}
+          {step === 4 && (
+            <div className="text-center">
+
+              <Check className="mx-auto text-green-600 mb-6" size={50}/>
+
+              <h2 className="text-3xl font-bold text-[#00304D] mb-4">
+                ¡Contraseña actualizada!
+              </h2>
+
+              <button
+                onClick={() => navigate("/login")}
+                className="bg-[#39A900] text-white px-6 py-3 rounded-lg"
+              >
+                Ir al login
+              </button>
             </div>
-          </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 
