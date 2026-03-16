@@ -24,16 +24,16 @@ export default function DefaultLayout({
       </div>
 
       {/* CONTENIDO DERECHO */}
-      <div className="flex flex-col flex-1 min-h-screen overflow-hidden bg-gray-50">
+      <div className="flex flex-col flex-1 min-h-screen overflow-hidden  bg-[#F0F2F5]">
 
         {/* NAVBAR */}
         <Navbar />
 
         {/* CONTENIDO */}
-        <main className="p-6 flex-1 overflow-y-auto">{children}</main>
+        <main className="p-6 flex-1 overflow-y-auto bg-[#EEF2F7]">{children}</main>
 
         {/* FOOTER */}
-        <Footer />
+        {/* <Footer /> */}
       </div>
     </div>
   );

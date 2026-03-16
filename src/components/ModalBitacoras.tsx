@@ -12,6 +12,7 @@ import { obtenerBitacoras } from "@/api/Bitacoras";
 import BitacorasCard from "./BitacorasCard";
 import BitacoraDetalleModal from "./BitacoraDetalleModal";
 import { PropsBitacora } from "@/types/ModalBitacora";
+import SubirBitacoraModal from "./SubirBitacoraModal";
 
 
 export default function BitacorasModal({
@@ -24,6 +25,7 @@ export default function BitacorasModal({
   const [loading, setLoading] = useState(false);
   const [selectedBitacora, setSelectedBitacora] = useState<any>(null);
   const [isDetalleOpen, setIsDetalleOpen] = useState(false);
+  const [isSubirOpen, setIsSubirOpen] = useState(false)
 
   const cargarBitacoras = async () => {
   if (!seguimiento) return;
@@ -57,36 +59,46 @@ useEffect(() => {
 console.log("Render bitacoras:", bitacoras);
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} size="lg">
+      <Modal isOpen={isOpen} onClose={onClose} size="2xl">
         <ModalContent>
           <ModalHeader>
             Bitácoras de {alumno?.name}
           </ModalHeader>
 
-          <ModalBody>
-            {loading ? (
-              <Spinner label="Cargando..." />
-            ) : bitacoras.length === 0 ? (
-              <p>No hay bitácoras registradas</p>
-            ) : (
-              <div className="flex flex-col gap-4">
-                {bitacoras.map((item) => (
- <BitacorasCard
-  key={item.id_bitacora}
-  item={item}
-  onClick={abrirDetalle}
-  recargarBitacoras={cargarBitacoras}
-/>
-))}
-              </div>
-            )}
-          </ModalBody>
+          <ModalBody className="overflow-y-auto max-h-[60vh]">
+  {loading ? (
+    <Spinner label="Cargando..." />
+  ) : bitacoras.length === 0 ? (
+    <p>No hay bitácoras registradas</p>
+  ) : (
+    <div className="grid grid-cols-2 gap-4">
+      {bitacoras.map((item) => (
+        <BitacorasCard
+          key={item.id_bitacora}
+          item={item}
+          onClick={abrirDetalle}
+          recargarBitacoras={cargarBitacoras}
+        />
+      ))}
+    </div>
+  )}
+</ModalBody>
 
           <ModalFooter>
-            <Button color="danger" variant="light" onPress={onClose}>
-              Cerrar
-            </Button>
-          </ModalFooter>
+  <Button color="danger" variant="light" onPress={onClose}>
+    Cerrar
+  </Button>
+  <Button color="primary" onPress={() => setIsSubirOpen(true)}
+    className="bg-gradient-to-r from-[#39A900] to-[#5cd600] 
+             hover:from-[#5cd600] hover:to-[#39A900]
+             transition-all duration-300 
+             hover:-translate-y-0.5 
+             hover:shadow-lg hover:shadow-[#39A900]/40
+             active:scale-95 text-white"
+    >
+    Subir bitácora
+  </Button>
+</ModalFooter>
         </ModalContent>
       </Modal>
 
@@ -95,6 +107,13 @@ console.log("Render bitacoras:", bitacoras);
         onClose={() => setIsDetalleOpen(false)}
         bitacora={selectedBitacora}
       />
+
+      <SubirBitacoraModal
+  isOpen={isSubirOpen}
+  onClose={() => setIsSubirOpen(false)}
+  seguimiento={seguimiento}
+  onSuccess={cargarBitacoras}
+/>
     </>
   );
 }

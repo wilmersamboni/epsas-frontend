@@ -20,6 +20,7 @@ export default function SeguimientosModal({
   isOpen,
   onClose,
   alumno,
+  onReopen,
 }: Props) {
   const [seguimientos, setSeguimientos] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -56,6 +57,7 @@ export default function SeguimientosModal({
   const abrirDetalle = (item: any) => {
     setSelectedSeguimiento(item);
     setIsDetalleOpen(true);
+    onClose();
   };
 
   // ✏️ Abrir edición
@@ -127,7 +129,9 @@ export default function SeguimientosModal({
       {selectedSeguimiento && (
         <BitacorasModal
           isOpen={isDetalleOpen}
-          onClose={() => setIsDetalleOpen(false)}
+          onClose={() => {setIsDetalleOpen(false);
+            onReopen?.()
+          }}
           alumno={alumno}
           seguimiento={selectedSeguimiento}
         />

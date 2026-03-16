@@ -49,7 +49,12 @@ export default function BitacorasCard({ item, onClick, recargarBitacoras }: Prop
       size="sm" 
       variant="flat" 
       color="primary"
-      className="font-medium mt-5"
+      className="font-medium mt-5 bg-gradient-to-r from-[#39A900] to-[#5cd600] 
+             hover:from-[#5cd600] hover:to-[#39A900]
+             transition-all duration-300 
+             hover:-translate-y-0.5 
+             hover:shadow-lg hover:shadow-[#39A900]/40
+             active:scale-95 text-white"
     >
       Evaluar Bitacora
     </Button>
